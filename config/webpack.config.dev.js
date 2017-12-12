@@ -54,7 +54,7 @@ module.exports = {
   ],
   output: {
     //Library namespace
-    library: 'reacttwilio',
+    library: 'reactchat',
 
     // Add /* filename */ comments to generated require()s in the output.
     pathinfo: true,

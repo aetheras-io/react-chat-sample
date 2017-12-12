@@ -1,6 +1,5 @@
 import SendBird from 'sendbird';
 import { xssEscape } from './utils';
-import { Channel } from 'twilio-chat/lib/data/channels';
 
 const MAX_COUNT = '+9';
 const GLOBAL_HANDLER = 'GLOBAL_HANDLER';

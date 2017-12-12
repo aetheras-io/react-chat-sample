@@ -59,7 +59,7 @@ module.exports = {
   entry: [require.resolve('./polyfills'), paths.appIndexJs],
   output: {
     //Library namespace
-    library: 'reacttwilio',
+    library: 'reactchat',
 
     // The build folder.
     path: paths.appBuild,
