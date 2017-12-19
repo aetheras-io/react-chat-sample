@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import ChatBox from '../components/chatbox';
 import ChatAPI from '../utils/chatapi';
 // import { ChatToken } from './mocks/api';
@@ -7,13 +8,17 @@ class ChatApp extends Component {
     constructor(props) {
         super(props);
 
-        const { userId, chatId } = this.props;
+        console.log(props);
+        props.test();
+        const { userId, nickName, chatId } = this.props;
         this.sb = new ChatAPI(chatId)
 
         //const name = localStorage.getItem('name') || '';
         this.state = {
             connected: false,
             userId: userId,
+            nickName: nickName,
+            isAdmin: false,
             channels: [],
             channelStates: [],
             users: [],
@@ -22,7 +27,8 @@ class ChatApp extends Component {
 
     componentWillMount = () => {
         console.log('Chat Mount');
-        this.sb.connect(this.state.userId, '', () => {
+        //this.sb.connect(this.state.userId, '', () => {
+        this.sb.connect(this.state.userId, this.state.nickName, () => {
             this.setState({ connected: true });
 
             //listen to invites
@@ -33,6 +39,35 @@ class ChatApp extends Component {
                 this.onUserLeft,
             )
 
+            // //leave all private channels
+            // this.sb.getGroupChannelList((list) => {
+            //     list.forEach(channel => {
+            //         console.log('Private: ', channel);
+            //         channel.leave();
+            //     });
+            // });
+
+            this.sb.getGroupChannelList((list) => {
+                console.log("GROUP CHANNELS: ", list);
+
+                let channels = this.state.channels;
+                let channelStates = this.state.channelStates;
+
+                list.forEach(channel => {
+                    console.log('Private: ', channel);
+
+                    let channelState = {
+                        messages: [],
+                        newMessage: '',
+                        submitting: false,
+                    };
+                    channels.push(channel);
+                    channelStates.push(channelState);
+                });
+                this.setState({ channels: channels, channelStates: channelStates })
+
+            });
+
             //find and join general channel
             this.sb.getOpenChannelList((list) => {
                 //console.log("OPEN CHANNELS: ", list)
@@ -40,9 +75,11 @@ class ChatApp extends Component {
                     return channel.channelId = "general";
                 })
 
-                generalChannel.enter((response, error) => {
+
+                let callback = (response, error) => {
                     if (error) {
                         console.log(error);
+                        generalChannel.enter(callback)
                         return;
                     }
                     console.log('joined channel: ', generalChannel.name);
@@ -56,20 +93,15 @@ class ChatApp extends Component {
 
                         this.setState({ users: filter })
                     });
-                })
+                }
+
+                generalChannel.enter(callback)
+
+                //check whether this user is an admin (operator of general open channel)
+                let isOperator = generalChannel.isOperatorWithUserId(this.state.userId)
+                this.setState({ isAdmin: isOperator })
             });
 
-            //leave all private channels
-            this.sb.getGroupChannelList((list) => {
-                list.forEach(channel => {
-                    console.log('Private: ', channel);
-                    channel.leave();
-                });
-            });
-
-            this.sb.getGroupChannelList((list) => {
-                console.log("GROUP CHANNELS: ", list);
-            });
 
             // //find friend to invite
             // this.sb.getUserList((list) => {
@@ -131,6 +163,8 @@ class ChatApp extends Component {
 
     onUserJoined = (channel, user) => {
         console.log("user joined: ", user.userId);
+        let users = this.state.users;
+        users.push(user)
     };
 
     onUserLeft = (channel, user) => {
@@ -170,6 +204,24 @@ class ChatApp extends Component {
         this.sb.createPrivateChannel([event.target.value], 'private chat 1', (a) => { console.log(a); });
     };
 
+    onLeaveGroupChannel = (channelIndex) => {
+        return event => {
+            console.log("Leave channel (index:", channelIndex, ")");
+            let channels = this.state.channels;
+            let channelStates = this.state.channelStates;
+            let channel = channels[channelIndex]
+
+            this.sb.channelLeave(channel, (response, error) => {
+                if (error) {
+                    console.error(error);
+                    return;
+                }
+                channels.splice(channelIndex, 1)
+                channelStates.splice(channelIndex, 1)
+                this.setState({ channels: channels, channelStates: channelStates })
+            })
+        }
+    };
 
     render() {
         if (this.state.channels.length === 0) {
@@ -191,16 +243,36 @@ class ChatApp extends Component {
 
 
         const boxes = this.state.channels.map((chan, index) => {
-            return <ChatBox key={index} id={index} onInputKeydown={this.onInputKeyDown} {...this.state.channelStates[index]} />
+            console.log("index:", index)
+            return <ChatBox name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} {...this.state.channelStates[index]} />
         });
 
         return (
             <div>
                 <p>Logged in as {this.state.userId}</p>
+                <hr />
                 {boxes}
             </div>
         );
     }
 }
 
-export default ChatApp;
+// export default ChatApp;
+
+
+
+const mapStateToProps = ({ window }) => ({
+    window,
+})
+
+const mapDispatchToProps = (dispatch) => ({
+    test: () => {
+        console.log("dispatch function called");
+        // dispatch({ type: "something" });
+    },
+})
+
+export default connect(
+    null,
+    mapDispatchToProps
+)(ChatApp)

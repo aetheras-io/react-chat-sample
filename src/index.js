@@ -24,18 +24,36 @@ ReactDOM.render(
     domElement
 );
 
-function show() {
-    store.dispatch(windowActions.windowLoadAction("denistsai"));
-}
+function connectUser(userId, nickName) {
 
-function show2() {
-    store.dispatch(windowActions.windowLoadAction("tiffanyfan"));
+    console.log('useridText:' + userId);
+    console.log('nicknameText:' + nickName);
+
+    store.dispatch(windowActions.windowLoadAction({
+        userId: userId,
+        nickName: nickName
+    }));
 }
 
 function hide() {
     store.dispatch(windowActions.windowUnloadAction());
 }
 
-export { show };
-export { show2 };
+export { connectUser };
 export { hide };
+
+// function show() {
+//     store.dispatch(windowActions.windowLoadAction("denistsai"));
+// }
+
+// function show2() {
+//     store.dispatch(windowActions.windowLoadAction("tiffanyfan"));
+// }
+
+// function hide() {
+//     store.dispatch(windowActions.windowUnloadAction());
+// }
+
+// export { show };
+// export { show2 };
+// export { hide };

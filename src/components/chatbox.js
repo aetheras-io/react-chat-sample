@@ -1,13 +1,13 @@
 import React from 'react';
 
 const ChatBox = props => {
-    const { id, messages, newMessage, submitting, onInputKeydown, onClosed } = props;
+    const { name, id, url, messages, newMessage, submitting, onInputKeydown, onCloseClick } = props;
     const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
     return (
         <div>
-            <h3>Messages</h3>
+            <h3>{name}</h3>
+            <h4> url: {url} </h4>
             {messageList}
-
             <input
                 autoFocus
                 type="text"
@@ -21,7 +21,8 @@ const ChatBox = props => {
             {submitting ? <p style={{ display: 'inline-block' }}> submitting...</p> : null}
 
             <br /> <br />
-            <button onClick={onClosed}>Log out</button>
+            <button value={id} onClick={onCloseClick}>Leave GroupChannel</button>
+            <hr />
         </div >
     )
 }

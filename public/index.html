@@ -28,8 +28,16 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <div id="root">
-    <input type="button" id="showApp" value="Connect User1" />
-    <input type="button" id="showApp2" value="Connect User2" />
+    <form id="connectUserForm">
+      UserID:
+      <br>
+      <input type="text" id="useridText" />
+      <br> NickName:
+      <br>
+      <input type="text" id="nicknameText" />
+      <br>
+      <input type="submit" id="connectBtn" value="Connect User" />
+    </form>
     <input type="button" id="hideApp" value="Disconnect App" />
   </div>
   <!--
@@ -46,8 +54,20 @@
 <script type="text/javascript">
   //console.log(testlib);
   //console.log(document.getElementById("showApp"));
-  document.getElementById("showApp").onclick = reactchat.show;
-  document.getElementById("showApp2").onclick = reactchat.show2;
+  console.log("this:", this);
+  document.getElementById("connectUserForm").onsubmit = (event) => {
+    var userId = document.getElementById("useridText").value
+    var nickName = document.getElementById("nicknameText").value
+    try {
+      reactchat.connectUser(userId, nickName)
+    }
+    catch (err) {
+      console.log(err)
+    }
+    return false;
+  }
+  // reactchat.connectUser;
+  //document.getElementById("connectBtn").onclick = reactchat.connectUser;
   document.getElementById("hideApp").onclick = reactchat.hide;
 </script>
 

@@ -6,7 +6,7 @@ class App extends Component {
     render() {
         return (
             this.props.window.loaded ?
-                <ChatApp userId={this.props.window.userId} chatId={'5DAF0672-DF3A-4025-B813-29E7492E5260'} /> :
+                <ChatApp userId={this.props.window.userId} nickName={this.props.window.nickName} isAdmin={this.props.window.isAdmin} chatId={'5DAF0672-DF3A-4025-B813-29E7492E5260'} /> :
                 null
         );
     }

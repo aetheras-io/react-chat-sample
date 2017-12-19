@@ -13,7 +13,8 @@ export default function reducer(state = initialState, action) {
     switch (action.type) {
         case WINDOW_LOAD:
             console.log('LOAD STATE');
-            return { ...state, loaded: true, userId: action.payload };
+            //return { ...state, loaded: true, userId: action.payload };
+            return { ...state, loaded: true, ...action.payload };
         case WINDOW_UNLOAD:
             console.log('UNLOAD STATE');
             return { ...state, loaded: false };
