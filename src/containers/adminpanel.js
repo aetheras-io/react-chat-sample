@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import UserProfile from '../components/userprofile';
 
 
 class AdminPanel extends Component {
@@ -24,10 +25,17 @@ class AdminPanel extends Component {
     }
 
     render() {
+
+        const profiles = this.state.users.map((user, index) => {
+            console.log("index:", index)
+            return <UserProfile userId={user.userId} nickName={user.nickname} connectStatus={user.connectionStatus} lastSeenAt={user.lastSeenAt} />
+        });
+
         return (
             <div>
-                AdminPanel
-        </div>);
+                User Profiles
+                {profiles}
+            </div>);
     };
 }
 

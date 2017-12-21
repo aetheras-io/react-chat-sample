@@ -265,11 +265,7 @@ class ChatApp extends Component {
                 {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
                 {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
                 <hr />
-                {
-                    this.props.dashboard.loaded ?
-                        <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> :
-                        null
-                }
+                {this.props.dashboard.loaded ? <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> : null}
                 {boxes}
 
             </div>
