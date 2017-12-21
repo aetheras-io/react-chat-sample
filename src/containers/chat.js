@@ -267,7 +267,7 @@ class ChatApp extends Component {
                 <hr />
                 {
                     this.props.dashboard.loaded ?
-                        <AdminPanel sb={this.sb} /> :
+                        <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> :
                         null
                 }
                 {boxes}

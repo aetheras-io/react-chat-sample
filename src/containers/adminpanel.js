@@ -4,8 +4,9 @@ import React, { Component } from 'react';
 class AdminPanel extends Component {
     constructor(props) {
         super(props);
-        const { sb } = this.props;
+        const { sb, generalChannel } = this.props;
         this.sb = sb
+        this.generalChannel = generalChannel
 
         this.state = {
             users: []
@@ -13,13 +14,13 @@ class AdminPanel extends Component {
     };
 
     componentWillMount = () => {
-        // this.sb.getUsersInChannel(generalChannel, (list) => {
-        //     let filter = list.filter(u => {
-        //         return u.userId !== this.state.userId && u.connectionStatus === 'online';
-        //     })
+        this.sb.getUsersInChannel(this.generalChannel, (list) => {
+            let filter = list.filter(u => {
+                return u.userId !== this.state.userId;
+            })
 
-        //     this.setState({ users: filter })
-        // });
+            this.setState({ users: filter })
+        });
     }
 
     render() {
