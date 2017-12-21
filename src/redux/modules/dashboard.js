@@ -12,11 +12,11 @@ export const dashboardUnloadAction = () => ({ type: DASHBOARD_UNLOAD });
 export default function reducer(state = initialState, action) {
     switch (action.type) {
         case DASHBOARD_LOAD:
-            console.log('LOAD STATE');
+            console.log('LOAD DASHBOARD');
             //return { ...state, loaded: true, userId: action.payload };
             return { ...state, loaded: true, ...action.payload };
         case DASHBOARD_UNLOAD:
-            console.log('UNLOAD STATE');
+            console.log('UNLOAD DASHBOARD');
             return { ...state, loaded: false };
         default:
             return state

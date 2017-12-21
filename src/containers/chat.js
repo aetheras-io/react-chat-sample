@@ -257,8 +257,8 @@ class ChatApp extends Component {
         return (
             <div>
                 <p>Logged in as {this.state.userId}</p>
-                {this.state.isAdmin ? <button onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
-                {this.state.isAdmin ? <button onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
+                {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
+                {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
                 <hr />
                 {boxes}
 
@@ -282,10 +282,12 @@ const mapDispatchToProps = (dispatch) => {
         },
 
         showDashboard: () => {
+            console.log("showDashboard");
             dispatch(dashbarodActions.dashboardLoadAction());
         },
 
-        hideDashoard: () => {
+        hideDashboard: () => {
+            console.log("hideDashoard");
             dispatch(dashbarodActions.dashboardUnloadAction())
         }
     }
