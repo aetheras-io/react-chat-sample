@@ -16,6 +16,7 @@ const mapStateToProps = ({ window }) => ({
     window,
 })
 
+
 export default connect(
     mapStateToProps
 )(App)
