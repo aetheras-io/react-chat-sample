@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import ChatBox from '../components/chatbox';
-import ChatAPI from '../utils/chatapi';
+// import ChatAPI from '../utils/chatapi';
 import * as dashbarodActions from '../redux/modules/dashboard';
 // import { ChatToken } from './mocks/api';
 
@@ -12,8 +12,10 @@ class ChatApp extends Component {
         console.log(props);
         props.test();
 
-        const { userId, nickName, chatId } = this.props;
-        this.sb = new ChatAPI(chatId)
+        //const { userId, nickName, chatId } = this.props;
+        const { userId, nickName, sb } = this.props;
+        // this.sb = new ChatAPI(chatId)
+        this.sb = sb
 
         //const name = localStorage.getItem('name') || '';
         this.state = {
