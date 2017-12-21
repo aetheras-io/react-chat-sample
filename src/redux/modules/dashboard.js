@@ -6,7 +6,7 @@ const initialState = {
     userId: "",
 };
 
-export const dashboardLoadAction = (payload) => ({ type: DASHBOARD_LOAD, payload });
+export const dashboardLoadAction = () => ({ type: DASHBOARD_LOAD });
 export const dashboardUnloadAction = () => ({ type: DASHBOARD_UNLOAD });
 
 export default function reducer(state = initialState, action) {
@@ -14,7 +14,7 @@ export default function reducer(state = initialState, action) {
         case DASHBOARD_LOAD:
             console.log('LOAD DASHBOARD');
             //return { ...state, loaded: true, userId: action.payload };
-            return { ...state, loaded: true, ...action.payload };
+            return { ...state, loaded: true };
         case DASHBOARD_UNLOAD:
             console.log('UNLOAD DASHBOARD');
             return { ...state, loaded: false };

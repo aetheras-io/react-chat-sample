@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import ChatBox from '../components/chatbox';
 // import ChatAPI from '../utils/chatapi';
 import * as dashbarodActions from '../redux/modules/dashboard';
+import AdminPanel from './adminpanel';
 // import { ChatToken } from './mocks/api';
 
 class ChatApp extends Component {
@@ -262,6 +263,11 @@ class ChatApp extends Component {
                 {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
                 {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
                 <hr />
+                {
+                    this.props.dashboard.loaded ?
+                        <AdminPanel /> :
+                        null
+                }
                 {boxes}
 
             </div>
