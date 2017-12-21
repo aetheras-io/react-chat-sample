@@ -24,6 +24,7 @@ class ChatApp extends Component {
             userId: userId,
             nickName: nickName,
             isAdmin: false,
+            generalChannel: null,
             channels: [],
             channelStates: [],
             users: [],
@@ -55,6 +56,7 @@ class ChatApp extends Component {
                     return channel.channelId = "general";
                 })
 
+                this.setState({ generalChannel: generalChannel })
 
                 let callback = (response, error) => {
                     if (error) {
@@ -66,13 +68,13 @@ class ChatApp extends Component {
                     // let chanList = this.state.channels;
                     // chanList.push(generalChannel);
 
-                    this.sb.getUsersInChannel(generalChannel, (list) => {
-                        let filter = list.filter(u => {
-                            return u.userId !== this.state.userId && u.connectionStatus === 'online';
-                        })
+                    // this.sb.getUsersInChannel(generalChannel, (list) => {
+                    //     let filter = list.filter(u => {
+                    //         return u.userId !== this.state.userId && u.connectionStatus === 'online';
+                    //     })
 
-                        this.setState({ users: filter })
-                    });
+                    //     this.setState({ users: filter })
+                    // });
 
                     //Show participated group channels
                     this.sb.getGroupChannelList((list) => {
@@ -265,7 +267,7 @@ class ChatApp extends Component {
                 <hr />
                 {
                     this.props.dashboard.loaded ?
-                        <AdminPanel /> :
+                        <AdminPanel sb={this.sb} /> :
                         null
                 }
                 {boxes}
