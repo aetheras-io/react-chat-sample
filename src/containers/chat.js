@@ -61,7 +61,20 @@ class ChatApp extends Component {
                 let callback = (response, error) => {
                     if (error) {
                         console.log(error);
-                        this.setState({ hasError: true, errMsg: error })
+
+                        this.sb.disconnect(() => {
+                            console.log('disconnected');
+                        });
+
+                        this.setState({ 
+                            connected: false,
+                            isAdmin: false,
+                            generalChannel: null,
+                            channels: [],
+                            channelStates: [],
+                            users: [],
+                            hasError: true, 
+                            errMsg: JSON.stringify(error) });
                         return;
                     }
                     console.log('joined channel: ', generalChannel.name);
@@ -94,11 +107,19 @@ class ChatApp extends Component {
                             channels.push(channel);
                             channelStates.push(channelState);
                         });
-                        this.setState({ channels: channels, channelStates: channelStates, hasError: false })
 
                         //check whether this user is an admin (operator of general open channel)
-                        let isOperator = generalChannel.isOperatorWithUserId(this.state.userId)
-                        this.setState({ isAdmin: isOperator })
+                        let isOperator = generalChannel.isOperatorWithUserId(this.state.userId);
+                        console.log("operators:", generalChannel.operators);
+
+                        this.setState({ 
+                            channels: channels, 
+                            channelStates: 
+                            channelStates, 
+                            isAdmin: isOperator,
+                            hasError: false, 
+                            errMsg:"",
+                        });
                     });
                 }
 
@@ -227,6 +248,8 @@ class ChatApp extends Component {
     };
 
     render() {
+        console.log("state:", this.state);
+
         if (this.state.hasError) {
             return (
                 <div>

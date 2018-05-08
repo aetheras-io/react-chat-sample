@@ -338,7 +338,7 @@ class ChatAPI {
         ];
 
         var _getDay = (val) => {
-            let day = parseInt(val);
+            let day = parseInt(val, 10);
             if (day === 1) {
                 return day + 'st';
             } else if (day === 2) {
