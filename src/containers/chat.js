@@ -50,31 +50,21 @@ class ChatApp extends Component {
             )
 
             //find and join general channel
-            this.sb.getOpenChannelList((list) => {
-                //console.log("OPEN CHANNELS: ", list)
-                let generalChannel = list.find((channel) => {
-                    return channel.channelId = "general";
-                })
+            this.sb.getOpenChannelInfo("general",(generalChannel) => {
+                console.log("generalChannel: ", generalChannel);
 
-                this.setState({ generalChannel: generalChannel })
+                this.setState({ generalChannel: generalChannel });
 
                 let callback = (response, error) => {
+
+                    console.log("response:", response);
                     if (error) {
                         console.log(error);
 
-                        this.sb.disconnect(() => {
-                            console.log('disconnected');
-                        });
-
                         this.setState({ 
-                            connected: false,
-                            isAdmin: false,
-                            generalChannel: null,
-                            channels: [],
-                            channelStates: [],
-                            users: [],
                             hasError: true, 
-                            errMsg: JSON.stringify(error) });
+                            errMsg: JSON.stringify(error) 
+                        });
                         return;
                     }
                     console.log('joined channel: ', generalChannel.name);
@@ -123,7 +113,7 @@ class ChatApp extends Component {
                     });
                 }
 
-                generalChannel.enter(callback)
+                generalChannel.enter(callback);
             });
 
 
@@ -250,6 +240,15 @@ class ChatApp extends Component {
     render() {
         console.log("state:", this.state);
 
+        let adminSection = (      
+            <div>          
+                {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
+                {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
+                <hr />
+                {this.props.dashboard.loaded ? <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> : null}
+            </div  >
+        );
+
         if (this.state.hasError) {
             return (
                 <div>
@@ -264,6 +263,7 @@ class ChatApp extends Component {
                 <div>
                     <p>{this.state.connected ? '(connected as ' + this.state.userId + ')' : '(waiting)'}...</p>
                     {this.state.users.map((u, i) => { return <button key={i} value={u.userId} onClick={this.onInviteUser}>{u.userId}</button> })}
+                    {adminSection}
                 </div>
             )
         }
@@ -285,12 +285,8 @@ class ChatApp extends Component {
         return (
             <div>
                 <p>Logged in as {this.state.userId}</p>
-                {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
-                {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
-                <hr />
-                {this.props.dashboard.loaded ? <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> : null}
+                {adminSection}
                 {boxes}
-
             </div>
         );
     }
