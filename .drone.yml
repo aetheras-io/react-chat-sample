@@ -25,7 +25,7 @@ pipeline:
     image: wyattjoh/drone-gcs
     pull: true
     acl: public
-    bucket: demo.uuss.net
+    bucket: demo.unionttplay.com
     source: build/**/*
     strip_prefix: build/
     target: /
