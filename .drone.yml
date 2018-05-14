@@ -1,0 +1,50 @@
+#Shared environment variables in .env file
+workspace:
+  base: /react
+  path: src/github.com/uniontsai/reactchat
+
+pipeline:
+  dependencies:
+    image: node:latest
+    commands:
+      - npm install
+      
+  tests:
+    image: node:latest
+    commands:
+      - npm run test
+
+  build:
+    image: node:latest
+    commands:
+      - npm -v
+      - npm run build
+
+  publish_google_cloud_bucket:
+    group: publishing
+    image: wyattjoh/drone-gcs
+    pull: true
+    acl: public
+    bucket: demo.uuss.net
+    source: build/**/*
+    strip_prefix: build/
+    target: /
+    secrets: 
+      - source: google_credentials
+        target: google_application_credentials_contents
+    when:
+      event: [ push, tag, pull_request ]
+
+  notify:
+    image: plugins/slack
+    pull: true
+    channel: dev-ci
+    secrets: [ slack_webhook ]
+    when:
+      status: [ success, failure ]
+    template:  >
+      {{#success build.status}}
+        [{{build.branch}}] *{{repo.name}}* build *{{build.number}}* type: *{{build.event}}* succeeded. {{build.link}}
+      {{else}}
+        [{{build.branch}}] *{{repo.name}}* build *{{build.number}}* type: *{{build.event}}* failed. {{build.link}}
+      {{/success}}
