@@ -22,18 +22,23 @@ class ChannelBoard extends Component {
             <div className="channel-board" style={{
                 display: display
             }}>
+                <div className='board-top'>
+                    <div className='title'>
+                        React Chat
+                    </div>
+                    {this.props.user.login ?
+                        <button onClick={disconnectUser}>Disconnect User</button> :
+                        null
+                    }
+                    <button onClick={handleHide}>Hide</button>
+                </div>
+
                 {this.props.user.login ?
                     <ChatApp userId={this.props.user.userId} nickName={this.props.user.nickName} isAdmin={this.props.user.isAdmin} sb={sb} /> :
                     null
                 }
-                {this.props.user.login ?
-                     <button onClick={disconnectUser}>Disconnect User</button> :
-                     null
-                }
                 <ConnectUserFormContainer display={this.props.user.login ? 'none' : 'block'} handleSubmit={connectUser}/> 
-                <br/>
-                <br/>
-                <button onClick={handleHide}>Hide</button>
+
             </div>
         );
     };
