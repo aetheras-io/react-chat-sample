@@ -28,7 +28,7 @@
     You need to enable JavaScript to run this app.
   </noscript>
   <div id="root">
-    <form id="connectUserForm">
+    <!-- <form id="connectUserForm">
       UserID:
       <br>
       <input type="text" id="useridText" />
@@ -38,7 +38,7 @@
       <br>
       <input type="submit" id="connectBtn" value="Connect User" />
     </form>
-    <input type="button" id="hideApp" value="Disconnect App" />
+    <input type="button" id="hideApp" value="Disconnect App" /> -->
   </div>
   <!--
       This HTML file is a template.
@@ -54,21 +54,21 @@
 <script type="text/javascript">
   //console.log(testlib);
   //console.log(document.getElementById("showApp"));
-  console.log("this:", this);
-  document.getElementById("connectUserForm").onsubmit = (event) => {
-    var userId = document.getElementById("useridText").value
-    var nickName = document.getElementById("nicknameText").value
-    try {
-      reactchat.connectUser(userId, nickName)
-    }
-    catch (err) {
-      console.log(err)
-    }
-    return false;
-  }
-  // reactchat.connectUser;
-  //document.getElementById("connectBtn").onclick = reactchat.connectUser;
-  document.getElementById("hideApp").onclick = reactchat.hide;
+  // console.log("this:", this);
+  // document.getElementById("connectUserForm").onsubmit = (event) => {
+  //   var userId = document.getElementById("useridText").value
+  //   var nickName = document.getElementById("nicknameText").value
+  //   try {
+  //     reactchat.connectUser(userId, nickName)
+  //   }
+  //   catch (err) {
+  //     console.log(err)
+  //   }
+  //   return false;
+  // }
+  // // reactchat.connectUser;
+  // //document.getElementById("connectBtn").onclick = reactchat.connectUser;
+  // document.getElementById("hideApp").onclick = reactchat.hide;
 </script>
 
 </html>
