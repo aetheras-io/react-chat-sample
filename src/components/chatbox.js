@@ -4,10 +4,12 @@ const ChatBox = props => {
     const { name, id, url, messages, newMessage, submitting, onInputKeydown, onCloseClick } = props;
     const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
     return (
-        <div className='chat-section'>
+        <div className='chat-board'>
             <h3>{name}</h3>
-            <h4> url: {url} </h4>
-            {messageList}
+            {/* <h4> url: {url} </h4> */}
+            <div className='content'>
+                {messageList}
+            </div>
             <input
                 className="input"
                 autoFocus

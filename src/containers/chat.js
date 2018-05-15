@@ -286,7 +286,12 @@ class ChatApp extends Component {
             <div>
                 <p>Logged in as {this.state.userId}</p>
                 {adminSection}
-                {boxes}
+                <div className='chat-section' style={{
+                    right: '280px',
+                    width:  this.state.channels.length * 300 + 'px',
+                }}>
+                    {boxes}
+                </div>
             </div>
         );
     }
