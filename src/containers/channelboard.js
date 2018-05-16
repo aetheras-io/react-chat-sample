@@ -30,7 +30,6 @@ class ChannelBoard extends Component {
                     null
                 }
                 <ConnectUserFormContainer display={this.props.user.login ? 'none' : 'block'} handleSubmit={connectUser}/> 
-
             </div>
         );
     };

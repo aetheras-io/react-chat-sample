@@ -4,6 +4,7 @@ import ChatBox from '../components/chatbox';
 // import ChatAPI from '../utils/chatapi';
 import * as dashbarodActions from '../redux/modules/dashboard';
 import AdminPanel from './adminpanel';
+import ChannelList from '../components/channellist';
 // import { ChatToken } from './mocks/api';
 
 class ChatApp extends Component {
@@ -237,6 +238,10 @@ class ChatApp extends Component {
         }
     };
 
+    handleClickOnItem = (e, index) => {
+        console.log("handleClickOnItem:", this.state.channels[index].name);
+    }
+
     render() {
         console.log("state:", this.state);
 
@@ -286,6 +291,8 @@ class ChatApp extends Component {
             <div>
                 <p>Logged in as {this.state.userId}</p>
                 {adminSection}
+                <ChannelList data={this.state.channels} onClick={this.handleClickOnItem}/>
+
                 <div className='chat-section' style={{
                     right: '280px',
                     width:  this.state.channels.length * 300 + 'px',

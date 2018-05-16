@@ -9,7 +9,7 @@ const ChatBox = props => {
             <BoxTop name={name} handleLeave={onCloseClick} />
 
             {/* <h4> url: {url} </h4> */}
-            
+
             <div className='content'>
                 <div className='message-content'>
                     <div className='message-list'>
@@ -26,6 +26,7 @@ const ChatBox = props => {
                     disabled={submitting}
                     onKeyPress={onInputKeydown}
                     style={{ display: 'inline-block' }}
+                    placeholder='Type-in your message'
                 />
                 {submitting ? <p style={{ display: 'inline-block' }}> submitting...</p> : null}
             </div>
