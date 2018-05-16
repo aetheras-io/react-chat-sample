@@ -1,19 +1,15 @@
 import React from 'react';
+import BoxTop from './boxtop';
 
 const ChatBox = props => {
     const { name, id, url, messages, newMessage, submitting, onInputKeydown, onCloseClick } = props;
     const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
     return (
         <div className='chat-board'>
-            <div className='top'>
-                <div className='title'>
-                    {name}
-                </div>
-                <div>
-                    <button value={id} onClick={onCloseClick}>Leave GroupChannel</button>
-                </div>
-            </div>
+            <BoxTop name={name} handleLeave={onCloseClick} />
+
             {/* <h4> url: {url} </h4> */}
+            
             <div className='content'>
                 <div className='message-content'>
                     <div className='message-list'>

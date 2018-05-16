@@ -262,7 +262,7 @@ class ChatApp extends Component {
             return (
                 <div>
                     <p>{this.state.connected ? '(connected as ' + this.state.userId + ')' : '(waiting)'}...</p>
-                    {this.state.users.map((u, i) => { return <button key={i} value={u.userId} onClick={this.onInviteUser}>{u.userId}</button> })}
+                    {/* {this.state.users.map((u, i) => { return <button key={i} value={u.userId} onClick={this.onInviteUser}>{u.userId}</button> })} */}
                     {adminSection}
                 </div>
             )
