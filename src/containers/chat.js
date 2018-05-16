@@ -30,7 +30,8 @@ class ChatApp extends Component {
             channelStates: [],
             users: [],
             hasError: false,
-            errMsg: ""
+            errMsg: "",
+            showStack: [],
         };
 
         this.init()
@@ -238,8 +239,33 @@ class ChatApp extends Component {
         }
     };
 
+    onHideChatBox = (showIndex) => {
+        return event => {
+            console.log("Hide Chatbox (index:", showIndex, ")");
+
+            let showStack = this.state.showStack;
+            showStack.splice(showIndex,1);
+            this.setState({
+                showStack: showStack
+            });
+        }
+    };
+
     handleClickOnItem = (e, index) => {
         console.log("handleClickOnItem:", this.state.channels[index].name);
+        
+        let showStack = this.state.showStack;
+        const showIndex = showStack.indexOf(index);
+
+        if (showIndex>-1){
+            showStack.splice(showIndex,1);
+        }
+
+        showStack.push(index);
+
+        this.setState({
+            showStack: showStack,
+        });
     }
 
     render() {
@@ -282,9 +308,10 @@ class ChatApp extends Component {
         // });
 
 
-        const boxes = this.state.channels.map((chan, index) => {
-            console.log("index:", index)
-            return <ChatBox name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} {...this.state.channelStates[index]} />
+        const boxes = this.state.showStack.map((chIndex, index) => {
+            console.log("chIndex:", chIndex);
+            const chan = this.state.channels[chIndex];
+            return <ChatBox name={chan.name} key={chIndex} url={chan.url} id={chIndex} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(chIndex)} onHideChatBox={this.onHideChatBox(index)} {...this.state.channelStates[chIndex]} />
         });
 
         return (

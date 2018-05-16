@@ -2,11 +2,11 @@ import React from 'react';
 import BoxTop from './boxtop';
 
 const ChatBox = props => {
-    const { name, id, url, messages, newMessage, submitting, onInputKeydown, onCloseClick } = props;
+    const { name, id, url, messages, newMessage, submitting, onInputKeydown, onCloseClick, onHideChatBox } = props;
     const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
     return (
         <div className='chat-board'>
-            <BoxTop name={name} handleLeave={onCloseClick} />
+            <BoxTop name={name} handleLeave={onCloseClick} handleClose={onHideChatBox} />
 
             {/* <h4> url: {url} </h4> */}
 
