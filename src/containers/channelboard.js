@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ConnectUserForm from '../components/connectUserForm';
+import BoardTop from '../components/boardtop';
 import { connect } from 'react-redux';
 import * as userActions from '../redux/modules/user';
 import ChatApp from './chat';
@@ -22,16 +23,7 @@ class ChannelBoard extends Component {
             <div className="channel-board" style={{
                 display: display
             }}>
-                <div className='board-top'>
-                    <div className='title'>
-                        React Chat
-                    </div>
-                    {this.props.user.login ?
-                        <button onClick={disconnectUser}>Disconnect User</button> :
-                        null
-                    }
-                    <button onClick={handleHide}>Hide</button>
-                </div>
+                <BoardTop login={this.props.user.login} handleDisconnect={disconnectUser} handleHide={handleHide}/>
 
                 {this.props.user.login ?
                     <ChatApp userId={this.props.user.userId} nickName={this.props.user.nickName} isAdmin={this.props.user.isAdmin} sb={sb} /> :
