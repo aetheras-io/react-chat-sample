@@ -1,10 +1,8 @@
 import React, { Component } from 'react';
-import ConnectUserForm from '../components/connectUserForm';
 import BoardTop from '../components/boardtop';
 import { connect } from 'react-redux';
-import * as userActions from '../redux/modules/user';
-import ChatApp from './chat';
-import { withFormik } from 'formik';
+import AdminChatApp from './adminapp';
+// import { withFormik } from 'formik';
 
 class ChannelBoard extends Component {
     constructor(props) {
@@ -13,10 +11,56 @@ class ChannelBoard extends Component {
         this.state={
 
         };
+
+        this.init();
     };
 
+    init = () => {
+        console.log('init');
+        const {sb, userId, nickName} = this.props;
+
+        sb.connect(userId, nickName, () => {
+            this.setState({ connected: true });
+
+            //find and join general channel
+            sb.getOpenChannelInfo("general",(generalChannel) => {
+                console.log("generalChannel: ", generalChannel);
+
+                this.setState({ generalChannel: generalChannel });
+
+                let callback = (response, error) => {
+
+                    console.log("response:", response);
+                    if (error) {
+                        console.log(error);
+
+                        this.setState({ 
+                            hasError: true, 
+                            errMsg: JSON.stringify(error) 
+                        });
+                        return;
+                    }
+                    console.log('joined channel: ', generalChannel.name);
+
+                    //check whether this user is an admin (operator of general open channel)
+                    let isOperator = generalChannel.isOperatorWithUserId(userId);
+                    console.log("operators:", generalChannel.operators);
+
+                    this.setState({ 
+                        isAdmin: isOperator,
+                        hasError: false, 
+                        errMsg:"",
+                    });
+                }
+
+                generalChannel.enter(callback);
+            });
+
+        });
+    }
+
     render() {
-        const {sb, display, handleHide, connectUser, disconnectUser} = this.props;
+        const {sb, display, handleHide } = this.props;
         console.log("props", this.props);
 
         let transition = "";
@@ -29,72 +73,49 @@ class ChannelBoard extends Component {
             transition = " sb-fade-in";
         }
 
+        let content = null;
+
+        if (this.state.isAdmin){
+            content = <AdminChatApp isAdmin={this.state.isAdmin} sb={sb} /> ;
+        }
+
 
         return (
             <div className={"channel-board" + transition} style={{
                 display: display
             }}>
-                <BoardTop login={this.props.user.login} handleDisconnect={disconnectUser} handleHide={handleHide}/>
-
-                {this.props.user.login ?
-                    <ChatApp userId={this.props.user.userId} nickName={this.props.user.nickName} isAdmin={this.props.user.isAdmin} sb={sb} /> :
-                    null
-                }
-                <ConnectUserFormContainer display={this.props.user.login ? 'none' : 'block'} handleSubmit={connectUser}/> 
+                <BoardTop  handleHide={handleHide}/>
+                {content}
             </div>
         );
     };
 }
 
-const ConnectUserFormContainer = withFormik({
-    mapPropsToValues: (props) => {
-        return {
-            userId: '',
-            nickName: '',
-        };
-    },
-    handleSubmit: (values, formikbag) => {
-        /* setValues, setStatus, and other goodies */
-        const { props, setSubmitting } = formikbag;
-        const { handleSubmit } = props;
-        const { userId, nickName } = values;
+// const ConnectUserFormContainer = withFormik({
+//     mapPropsToValues: (props) => {
+//         return {
+//             userId: '',
+//             nickName: '',
+//         };
+//     },
+//     handleSubmit: (values, formikbag) => {
+//         /* setValues, setStatus, and other goodies */
+//         const { props, setSubmitting } = formikbag;
+//         const { handleSubmit } = props;
+//         const { userId, nickName } = values;
 
-        handleSubmit(userId, nickName);
+//         handleSubmit(userId, nickName);
 
-        setSubmitting(false);
-    },
-    displayName: 'ConnectUserFormContainer', // helps with React DevTools
-})(ConnectUserForm);
+//         setSubmitting(false);
+//     },
+//     displayName: 'ConnectUserFormContainer', // helps with React DevTools
+// })(ConnectUserForm);
 
-const mapStateToProps = ({ user, window }) => ({
-    user, window,
+const mapStateToProps = ({  window }) => ({
+    window,
 })
 
-const mapDispatchToProps = (dispatch) => {
-
-    return {
-        test: () => {
-            console.log("hello");
-            dispatch({ type: 'some action' });
-        },
-
-        connectUser: (userId, nickName) => {
-            console.log("connectUser");
-            dispatch(userActions.userConnectAction({
-                userId: userId,
-                nickName: nickName
-            }));
-        },
-
-        disconnectUser: () => {
-            console.log("disconnectUser");
-            dispatch(userActions.userDisconnectAction())
-        }
-    }
-
-}
 
 export default connect(
-    mapStateToProps,
-    mapDispatchToProps
+    mapStateToProps
 )(ChannelBoard);

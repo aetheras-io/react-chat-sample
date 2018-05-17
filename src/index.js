@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import { Provider } from 'react-redux';
 import configureStore from './redux/create';
-import * as windowActions from './redux/modules/window';
+// import * as windowActions from './redux/modules/window';
+import * as userActions from './redux/modules/user';
 
 const { store } = configureStore({}); //pass in initial state, take out thunk.  Used to be const { store, thunk}
 
@@ -29,14 +30,14 @@ function connectUser(userId, nickName) {
     console.log('useridText:' + userId);
     console.log('nicknameText:' + nickName);
 
-    store.dispatch(windowActions.windowLoadAction({
+    store.dispatch(userActions.userConnectAction({
         userId: userId,
         nickName: nickName
     }));
 }
 
 function hide() {
-    store.dispatch(windowActions.windowUnloadAction());
+    store.dispatch(userActions.userDisconnectAction());
 }
 
 export { connectUser };

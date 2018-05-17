@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-// import { connect } from 'react-redux';
+import { connect } from 'react-redux';
 // import * as windowActions from './redux/modules/window';
 import ChatAPI from './utils/chatapi';
 import './App.css';
@@ -17,9 +17,11 @@ class App extends Component {
     }
 
     handleClick = ()=>{
-        this.setState({
-            show:true,
-        });
+        if (this.props.user.login){
+            this.setState({
+                show:true,
+            });
+        }
     }
 
     handleHide = () => {
@@ -33,10 +35,6 @@ class App extends Component {
     render() {
         console.log("state:", this.state);
 
-        //  {this.props.window.loaded ?
-        //     <ConnectUserFormContainer sb={sb} /> :
-        //     null } 
-
         let transition = "";
 
         if (this.state.show){
@@ -47,7 +45,9 @@ class App extends Component {
 
         return (
             <div id="sb_widget" >
-                <ChannelBoard display={this.state.show ? 'block' : 'none'} sb={sb} handleHide={this.handleHide}/> 
+                {this.props.user.login ?<ChannelBoard display={this.state.show ? 'block' : 'none'} sb={sb} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide}/> :
+                null
+                }
                 <div className={ 'widget ic-connected' + transition } onClick={this.handleClick} style={{
                     display: this.state.show ? 'none' : 'block'
                 }}>
@@ -57,13 +57,11 @@ class App extends Component {
     }
 }
 
-export default App;
-
-// const mapStateToProps = ({ window }) => ({
-//     window,
-// })
+const mapStateToProps = ({ user }) => ({
+    user,
+})
 
 
-// export default connect(
-//     mapStateToProps
-// )(App)
+export default connect(
+    mapStateToProps
+)(App)

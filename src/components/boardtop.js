@@ -1,7 +1,7 @@
 import React from 'react';
 
 const BoardTop = props => {
-    const {login, handleDisconnect, handleHide} = props;
+    const {handleHide} = props;
 
     return (
         <div className='board-top'>
@@ -9,7 +9,7 @@ const BoardTop = props => {
                 React Chat
             </div>
  
-            {login ?
+            {/* {login ?
                 (
                     <div style={{
                         float:'right',
@@ -19,7 +19,7 @@ const BoardTop = props => {
                     </div>
                 ) :
                 null
-            }
+            } */}
 
             <div style={{
                         float:'right',
