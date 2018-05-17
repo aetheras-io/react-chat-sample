@@ -19,8 +19,19 @@ class ChannelBoard extends Component {
         const {sb, display, handleHide, connectUser, disconnectUser} = this.props;
         console.log("props", this.props);
 
+        let transition = "";
+
+        if (display==="none"){
+            transition = " sb-fade-out";
+        }
+
+        if (display==="block"){
+            transition = " sb-fade-in";
+        }
+
+
         return (
-            <div className="channel-board" style={{
+            <div className={"channel-board" + transition} style={{
                 display: display
             }}>
                 <BoardTop login={this.props.user.login} handleDisconnect={disconnectUser} handleHide={handleHide}/>

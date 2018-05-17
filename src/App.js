@@ -37,13 +37,20 @@ class App extends Component {
         //     <ConnectUserFormContainer sb={sb} /> :
         //     null } 
 
+        let transition = "";
+
+        if (this.state.show){
+            transition = " sb-fade-out";
+        }else{
+            transition = " sb-fade-in";
+        }
+
         return (
             <div id="sb_widget" >
                 <ChannelBoard display={this.state.show ? 'block' : 'none'} sb={sb} handleHide={this.handleHide}/> 
-                <div onClick={this.handleClick} style={{
+                <div className={ 'widget ic-connected' + transition } onClick={this.handleClick} style={{
                     display: this.state.show ? 'none' : 'block'
                 }}>
-                    Click to open
                 </div>
             </div>   
         );
