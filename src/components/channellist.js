@@ -1,6 +1,4 @@
 import React from 'react';
-import Icon from '@material-ui/core/Icon';
-import Button from '@material-ui/core/Button';
 
 const ChannelList = props => {
     const {data, onClick} = props;
@@ -11,13 +9,15 @@ const ChannelList = props => {
                 key={'channelItem_' + index}
                 onClick={e => { onClick(e, index) }}>
                
-                <div >
-                    <Button>
-                        {task.name}
-                        <Icon style={{
-                            marginLeft: 10
-                        }}>open_in_browser</Icon>
-                    </Button>
+                <div style={{
+                    cursor: 'pointer'
+                }}>
+                    {task.name}
+                    <i className="material-icons" style={{
+                        marginLeft: 10
+                    }}>
+                        open_in_browser
+                    </i>
                 </div>
             </li >
         );

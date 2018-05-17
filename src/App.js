@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
+// import { connect } from 'react-redux';
 // import * as windowActions from './redux/modules/window';
 import ChatAPI from './utils/chatapi';
 import './App.css';
