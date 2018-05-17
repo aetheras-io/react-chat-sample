@@ -31,7 +31,6 @@ class ChatApp extends Component {
             users: [],
             hasError: false,
             errMsg: "",
-            showStack: [],
         };
 
         this.init()
@@ -232,40 +231,43 @@ class ChatApp extends Component {
                     console.error(error);
                     return;
                 }
+
+
                 channels.splice(channelIndex, 1)
                 channelStates.splice(channelIndex, 1)
-                this.setState({ channels: channels, channelStates: channelStates })
+                this.setState({ 
+                    channels: channels, 
+                    channelStates: channelStates
+                 });
             })
         }
     };
 
-    onHideChatBox = (showIndex) => {
+    onHideChatBox = (index) => {
         return event => {
-            console.log("Hide Chatbox (index:", showIndex, ")");
-
-            let showStack = this.state.showStack;
-            showStack.splice(showIndex,1);
+            console.log("Hide Chatbox (index:", index, ")");
+            let states = this.state.channelStates;
+            let state = states[index]
+            state["show"] = false;
+            
             this.setState({
-                showStack: showStack
+                channelStates: states
             });
         }
     };
 
     handleClickOnItem = (e, index) => {
-        console.log("handleClickOnItem:", this.state.channels[index].name);
+        const chan = this.state.channels[index];
+        console.log("handleClickOnItem:", chan.name);
+
+        let states = this.state.channelStates;
+        let state = states[index]
+        state["show"] = true;
         
-        let showStack = this.state.showStack;
-        const showIndex = showStack.indexOf(index);
-
-        if (showIndex>-1){
-            showStack.splice(showIndex,1);
-        }
-
-        showStack.push(index);
-
         this.setState({
-            showStack: showStack,
+            channelStates: states
         });
+
     }
 
     render() {
@@ -307,11 +309,16 @@ class ChatApp extends Component {
         //     );
         // });
 
+        const boxes = this.state.channels.map((chan, index) => {
+            console.log("index:", index);
+            
+            const state = this.state.channelStates[index];
 
-        const boxes = this.state.showStack.map((chIndex, index) => {
-            console.log("chIndex:", chIndex);
-            const chan = this.state.channels[chIndex];
-            return <ChatBox name={chan.name} key={chIndex} url={chan.url} id={chIndex} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(chIndex)} onHideChatBox={this.onHideChatBox(index)} {...this.state.channelStates[chIndex]} />
+            if (!state.show) {
+                return null;
+            }
+
+            return <ChatBox name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />
         });
 
         return (
