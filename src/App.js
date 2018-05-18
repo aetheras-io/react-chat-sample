@@ -1,11 +1,9 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as windowActions from './redux/modules/window';
-import ChatAPI from './utils/chatapi';
+import * as userActions from './redux/modules/user';
 import './App.css';
 import ChannelBoard from './containers/channelboard';
-
-const sb = new ChatAPI('FDA75C2D-F0F0-43A6-A5A8-B7CCC998AE17');
 
 class App extends Component {
     constructor(props){
@@ -17,7 +15,7 @@ class App extends Component {
         };
     }
 
-    handleClick = ()=>{
+    handleClick = () => {
         if (this.props.user.login){
             this.props.showWindow();
         }
@@ -32,7 +30,6 @@ class App extends Component {
         console.log("props:", this.props);
 
         let icon = null;
-        let board = null;
 
         if (this.props.user.login && this.props.window.loaded){
             icon=  <div className={ 'widget ic-connected sb-fade-out' } onClick={this.handleClick} style={{
@@ -46,8 +43,11 @@ class App extends Component {
         return (
             <div id="sb_widget" >
                 {icon}
-                {this.props.user.login ? <ChannelBoard display={this.props.window.loaded ?'block' : 'none'} sb={sb} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide}/>:
-                null}
+                {this.props.user.login ? 
+                    <ChannelBoard display={this.props.window.loaded ?'block' : 'none'} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide} handleDisconnect={this.props.disconnectUser}/>
+                    :
+                    null
+                }
             </div>   
         );
     }
@@ -65,6 +65,10 @@ const mapDispatchToProps =(dispatch) => {
 
         hideWindow: () => {
             dispatch(windowActions.windowUnloadAction());
+        },
+
+        disconnectUser: () => {
+            dispatch(userActions.userDisconnectAction());            
         }
     };
 };

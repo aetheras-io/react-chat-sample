@@ -148,7 +148,7 @@ class AdminChatApp extends Component {
             let channelStates = this.state.channelStates;
             let channel = channels[channelIndex]
 
-            this.sb.channelLeave(channel, (response, error) => {
+            this.sb.groupChannelLeave(channel, (response, error) => {
                 if (error) {
                     console.error(error);
                     return;
@@ -191,6 +191,13 @@ class AdminChatApp extends Component {
         });
 
     }
+
+    componentWillUnmount = () => {
+        console.log('AdminChat Unmount');
+        this.sb.disconnect(() => {
+            console.log('disconnected');
+        })
+    };
 
     render() {
         console.log("state:", this.state);

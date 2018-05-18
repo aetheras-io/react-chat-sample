@@ -149,7 +149,7 @@ class CustomerChatApp extends Component {
             let channelStates = this.state.channelStates;
             let channel = channels[channelIndex]
 
-            this.sb.channelLeave(channel, (response, error) => {
+            this.sb.groupChannelLeave(channel, (response, error) => {
                 if (error) {
                     console.error(error);
                     return;
@@ -162,8 +162,42 @@ class CustomerChatApp extends Component {
                     channels: channels, 
                     channelStates: channelStates
                  });
-            })
+            });
         }
+    };
+
+    componentWillUnmount = () => {
+        console.log('CustomerChat Unmount');
+        const {generalChannel} = this.props;
+
+        //Leave general channel to avoid matching again
+        this.sb.openChannelExit(generalChannel, (response, error) => {
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            console.log("response:", response);
+
+            //Leave all the group channel
+
+            this.state.channels.map((channel, index) => {
+                console.log("channel: ",channel);
+
+                this.sb.groupChannelLeave(channel, (response, error) => {
+                    if (error) {
+                        console.error(error);
+                        return;
+                    }
+
+                    console.log("response:", response);
+
+                    this.sb.disconnect(() => {
+                        console.log('disconnected');
+                    })
+                })
+            });
+        });
     };
 
     render() {
@@ -198,7 +232,7 @@ class CustomerChatApp extends Component {
 
             return ( 
                 <div  key={index}>
-                    <BoxTop name={chan.name} handleLeave={this.onLeaveGroupChannel(index)}  />
+                    <BoxTop name={'Logged in as ' + userId}  />
                     <ChatBox name={chan.name} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} {...state} />
                 </div>
             );

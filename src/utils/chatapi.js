@@ -171,8 +171,18 @@ class ChatAPI {
         });
     }
 
-    channelLeave(channel, action) {
+    groupChannelLeave(channel, action) {
         channel.leave((response, error) => {
+            if (error) {
+                console.error(error);
+                return;
+            }
+            action();
+        });
+    }
+
+    openChannelExit(channel, action) {
+        channel.exit((response, error) => {
             if (error) {
                 console.error(error);
                 return;

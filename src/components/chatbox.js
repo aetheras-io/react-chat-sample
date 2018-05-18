@@ -1,7 +1,7 @@
 import React from 'react';
 
 const ChatBox = props => {
-    const { name, id, messages, newMessage, submitting, onInputKeydown} = props;
+    const { id, messages, newMessage, submitting, onInputKeydown} = props;
     const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
     return (
         <div className='content'>
