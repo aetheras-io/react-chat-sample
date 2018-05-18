@@ -172,6 +172,8 @@ class CustomerChatApp extends Component {
                         console.log('disconnected');
                     })
                 })
+
+                return null;
             });
         });
     };
