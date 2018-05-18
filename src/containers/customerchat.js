@@ -1,26 +1,19 @@
 import React, { Component } from 'react';
 import ChatBox from '../components/chatbox';
-import ChannelList from '../components/channellist';
+import BoxTop from '../components/boxtop';
 // import { ChatToken } from './mocks/api';
 
-class ChatApp extends Component {
+class CustomerChatApp extends Component {
     constructor(props) {
         super(props);
 
         console.log(props);
 
-        //const { userId, nickName, chatId } = this.props;
         const { sb } = this.props;
 
         this.sb = sb
 
-        //const name = localStorage.getItem('name') || '';
         this.state = {
-            connected: false,
-            // userId: userId,
-            // nickName: nickName,
-            // isAdmin: false,
-            // generalChannel: null,
             channels: [],
             channelStates: [],
             users: [],
@@ -72,13 +65,6 @@ class ChatApp extends Component {
         });
 
 
-    };
-
-    componentWillUnmount = () => {
-        console.log('Chat Unmount');
-        this.sb.disconnect(() => {
-            console.log('disconnected');
-        })
     };
 
     onInvited = (channel, inviter, invitees) => {
@@ -180,45 +166,9 @@ class ChatApp extends Component {
         }
     };
 
-    onHideChatBox = (index) => {
-        return event => {
-            console.log("Hide Chatbox (index:", index, ")");
-            let states = this.state.channelStates;
-            let state = states[index]
-            state["show"] = false;
-            
-            this.setState({
-                channelStates: states
-            });
-        }
-    };
-
-    handleClickOnItem = (e, index) => {
-        const chan = this.state.channels[index];
-        console.log("handleClickOnItem:", chan.name);
-
-        let states = this.state.channelStates;
-        let state = states[index]
-        state["show"] = true;
-        
-        this.setState({
-            channelStates: states
-        });
-
-    }
-
     render() {
         console.log("state:", this.state);
-
-        let adminSection = (      
-            <div>          
-                {/* {this.state.isAdmin ? <button id="showDashBtn" onClick={this.props.showDashboard}>Show Admin Dashboard</button> : null}
-                {this.state.isAdmin ? <button id="hideDashBtn" onClick={this.props.hideDashboard}>Hide Admin Dashboard</button> : null}
-                <hr />
-                {this.props.dashboard.loaded ? <AdminPanel sb={this.sb} generalChannel={this.state.generalChannel} /> : null} */}
-                 <ChannelList data={this.state.channels} onClick={this.handleClickOnItem}/>
-            </div  >
-        );
+        const {userId} = this.props;
 
         if (this.state.hasError) {
             return (
@@ -232,9 +182,7 @@ class ChatApp extends Component {
         if (this.state.channels.length === 0) {
             return (
                 <div>
-                    <p>{this.state.connected ? '(connected as ' + this.state.userId + ')' : '(waiting)'}...</p>
-                    {/* {this.state.users.map((u, i) => { return <button key={i} value={u.userId} onClick={this.onInviteUser}>{u.userId}</button> })} */}
-                    {adminSection}
+                    <p>Waiting for your service agent...</p>
                 </div>
             )
         }
@@ -248,18 +196,19 @@ class ChatApp extends Component {
                 return null;
             }
 
-            return <ChatBox name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />
+            return ( 
+                <div  key={index}>
+                    <BoxTop name={chan.name} handleLeave={this.onLeaveGroupChannel(index)}  />
+                    <ChatBox name={chan.name} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} {...state} />
+                </div>
+            );
         });
 
         return (
             <div>
-                <p>Logged in as {this.state.userId}</p>
-                {adminSection}
-               
-
                 <div className='chat-section' style={{
-                    right: '280px',
-                    width:  this.state.channels.length * 300 + 'px',
+                    width: '100%',
+                    right: '0'
                 }}>
                     {boxes}
                 </div>
@@ -268,4 +217,4 @@ class ChatApp extends Component {
     }
 }
 
-export default ChatApp
+export default CustomerChatApp;

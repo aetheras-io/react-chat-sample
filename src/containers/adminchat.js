@@ -1,7 +1,6 @@
 import React, { Component } from 'react';
-import ChatBox from '../components/chatbox';
+import ChatBoard from '../components/chatboard';
 import ChannelList from '../components/channellist';
-// import { ChatToken } from './mocks/api';
 
 class AdminChatApp extends Component {
     constructor(props) {
@@ -9,18 +8,11 @@ class AdminChatApp extends Component {
 
         console.log(props);
 
-        //const { userId, nickName, chatId } = this.props;
         const { sb } = this.props;
-
         this.sb = sb
 
-        //const name = localStorage.getItem('name') || '';
         this.state = {
             connected: false,
-            // userId: userId,
-            // nickName: nickName,
-            // isAdmin: false,
-            // generalChannel: null,
             channels: [],
             channelStates: [],
             users: [],
@@ -72,13 +64,6 @@ class AdminChatApp extends Component {
         });
 
 
-    };
-
-    componentWillUnmount = () => {
-        console.log('Chat Unmount');
-        this.sb.disconnect(() => {
-            console.log('disconnected');
-        })
     };
 
     onInvited = (channel, inviter, invitees) => {
@@ -209,7 +194,7 @@ class AdminChatApp extends Component {
 
     render() {
         console.log("state:", this.state);
-        const {userId, nickName} = this.props;
+        const {userId} = this.props;
 
 
         if (this.state.hasError) {
@@ -224,7 +209,7 @@ class AdminChatApp extends Component {
         if (this.state.channels.length === 0) {
             return (
                 <div>
-                    <p>{this.state.connected ? '(connected as ' + userId + ')' : '(waiting)'}...</p>
+                    <p> {'(connected as ' + userId + ')'}</p>
                 </div>
             )
         }
@@ -238,7 +223,7 @@ class AdminChatApp extends Component {
                 return null;
             }
 
-            return <ChatBox name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />
+            return <ChatBoard name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />;
         });
 
         return (
@@ -258,4 +243,4 @@ class AdminChatApp extends Component {
     }
 }
 
-export default AdminChatApp
+export default AdminChatApp;

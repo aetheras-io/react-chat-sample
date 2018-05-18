@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-// import * as windowActions from './redux/modules/window';
+import * as windowActions from './redux/modules/window';
 import ChatAPI from './utils/chatapi';
 import './App.css';
 import ChannelBoard from './containers/channelboard';
@@ -11,57 +11,66 @@ class App extends Component {
     constructor(props){
         super(props);
 
+        //stateless
         this.state = {
-            show: false,
+
         };
     }
 
     handleClick = ()=>{
         if (this.props.user.login){
-            this.setState({
-                show:true,
-            });
+            this.props.showWindow();
         }
     }
 
     handleHide = () => {
         console.log("handleHide");
-
-        this.setState({
-            show:false,
-        });
+        this.props.hideWindow();
     }
 
     render() {
-        console.log("state:", this.state);
+        console.log("props:", this.props);
 
-        let transition = "";
+        let icon = null;
+        let board = null;
 
-        if (this.state.show){
-            transition = " sb-fade-out";
+        if (this.props.user.login && this.props.window.loaded){
+            icon=  <div className={ 'widget ic-connected sb-fade-out' } onClick={this.handleClick} style={{
+                display: 'none'}}></div>;
+
         }else{
-            transition = " sb-fade-in";
+            icon=  <div className={ 'widget ic-connected sb-fade-in' } onClick={this.handleClick} style={{
+                display: 'block'}}></div>;
         }
 
         return (
             <div id="sb_widget" >
-                {this.props.user.login ?<ChannelBoard display={this.state.show ? 'block' : 'none'} sb={sb} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide}/> :
-                null
-                }
-                <div className={ 'widget ic-connected' + transition } onClick={this.handleClick} style={{
-                    display: this.state.show ? 'none' : 'block'
-                }}>
-                </div>
+                {icon}
+                {this.props.user.login ? <ChannelBoard display={this.props.window.loaded ?'block' : 'none'} sb={sb} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide}/>:
+                null}
             </div>   
         );
     }
 }
 
-const mapStateToProps = ({ user }) => ({
-    user,
-})
+const mapStateToProps = ({ window, user }) => ({
+    window, user,
+});
+
+const mapDispatchToProps =(dispatch) => {
+    return {
+        showWindow: () => {
+            dispatch(windowActions.windowLoadAction({}));
+        },
+
+        hideWindow: () => {
+            dispatch(windowActions.windowUnloadAction());
+        }
+    };
+};
 
 
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(App)

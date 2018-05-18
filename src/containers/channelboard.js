@@ -1,12 +1,15 @@
 import React, { Component } from 'react';
 import BoardTop from '../components/boardtop';
-import { connect } from 'react-redux';
-import AdminChatApp from './adminapp';
+import AdminChatApp from './adminchat';
+import CustomerChatApp from './customerchat';
 // import { withFormik } from 'formik';
 
 class ChannelBoard extends Component {
     constructor(props) {
         super(props);
+
+        const {sb} = this.props;
+        this.sb = sb;
 
         this.state={
 
@@ -17,13 +20,13 @@ class ChannelBoard extends Component {
 
     init = () => {
         console.log('init');
-        const {sb, userId, nickName} = this.props;
+        const {userId, nickName} = this.props;
 
-        sb.connect(userId, nickName, () => {
-            this.setState({ connected: true });
+        this.sb.connect(userId, nickName, () => {
+            //this.setState({ connected: true });
 
             //find and join general channel
-            sb.getOpenChannelInfo("general",(generalChannel) => {
+            this.sb.getOpenChannelInfo("general",(generalChannel) => {
                 console.log("generalChannel: ", generalChannel);
 
                 this.setState({ generalChannel: generalChannel });
@@ -47,6 +50,7 @@ class ChannelBoard extends Component {
                     console.log("operators:", generalChannel.operators);
 
                     this.setState({ 
+                        connected: true,
                         isAdmin: isOperator,
                         hasError: false, 
                         errMsg:"",
@@ -59,8 +63,15 @@ class ChannelBoard extends Component {
         });
     }
 
+    componentWillUnmount = () => {
+        console.log('Chat Unmount');
+        this.sb.disconnect(() => {
+            console.log('disconnected');
+        })
+    };
+
     render() {
-        const {sb, display, handleHide } = this.props;
+        const {display, userId, handleHide } = this.props;
         console.log("props", this.props);
 
         let transition = "";
@@ -75,10 +86,15 @@ class ChannelBoard extends Component {
 
         let content = null;
 
-        if (this.state.isAdmin){
-            content = <AdminChatApp isAdmin={this.state.isAdmin} sb={sb} /> ;
+        if (this.state.connected){
+            if (this.state.isAdmin){
+                content = <AdminChatApp userId={userId} sb={this.sb} /> ;
+            } else{
+                content = <CustomerChatApp userId={userId} sb={this.sb} handleHide={handleHide}/>;
+            }
+        }else{
+            content= <p>Wait for connecting....</p>;
         }
-
 
         return (
             <div className={"channel-board" + transition} style={{
@@ -111,11 +127,4 @@ class ChannelBoard extends Component {
 //     displayName: 'ConnectUserFormContainer', // helps with React DevTools
 // })(ConnectUserForm);
 
-const mapStateToProps = ({  window }) => ({
-    window,
-})
-
-
-export default connect(
-    mapStateToProps
-)(ChannelBoard);
+export default ChannelBoard;
