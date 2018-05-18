@@ -142,30 +142,6 @@ class CustomerChatApp extends Component {
         this.sb.createPrivateChannel([event.target.value], 'private chat 1', (a) => { console.log(a); });
     };
 
-    onLeaveGroupChannel = (channelIndex) => {
-        return event => {
-            console.log("Leave channel (index:", channelIndex, ")");
-            let channels = this.state.channels;
-            let channelStates = this.state.channelStates;
-            let channel = channels[channelIndex]
-
-            this.sb.groupChannelLeave(channel, (response, error) => {
-                if (error) {
-                    console.error(error);
-                    return;
-                }
-
-
-                channels.splice(channelIndex, 1)
-                channelStates.splice(channelIndex, 1)
-                this.setState({ 
-                    channels: channels, 
-                    channelStates: channelStates
-                 });
-            });
-        }
-    };
-
     componentWillUnmount = () => {
         console.log('CustomerChat Unmount');
         const {generalChannel} = this.props;
