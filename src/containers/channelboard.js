@@ -52,8 +52,7 @@ class ChannelBoard extends Component {
                     console.log("operators:", generalChannel.operators);
 
                     //redux
-                    this.props.sbConnect();
-                    this.props.sbSetAdmin(isOperator);
+                    this.props.sbConnect(isOperator);
 
                     // this.setState({ 
                     //     connected: true,
@@ -123,11 +122,8 @@ const mapStateToProps = ({ sendbird }) => ({
 
 const mapDispatchToProps =(dispatch) => {
     return {
-        sbConnect: () => {
-            dispatch(sendbirdActions.sbConnectAction({}));
-        },
-        sbSetAdmin: (isAdmin)=> {
-            dispatch(sendbirdActions.sbSetAdminAction({isAdmin:isAdmin}));
+        sbConnect: (isAdmin) => {
+            dispatch(sendbirdActions.sbConnectAction({isAdmin:isAdmin}));
         },
         sbSetGeneralChan: (generalChannel)=>{
             dispatch(sendbirdActions.sbSetGeneralChanAction({generalChannel:generalChannel}));
