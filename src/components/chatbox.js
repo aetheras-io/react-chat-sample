@@ -16,7 +16,7 @@ const ChatBox = props => {
                 type="text"
                 name="message"
                 id={id}
-                value={newMessage}
+                defaultValue={newMessage}
                 disabled={submitting}
                 onKeyPress={onInputKeydown}
                 style={{ display: 'inline-block' }}

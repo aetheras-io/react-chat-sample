@@ -3,6 +3,8 @@ import BoardTop from '../components/boardtop';
 import AdminChatApp from './adminchat';
 import CustomerChatApp from './customerchat';
 import ChatAPI from '../utils/chatapi';
+import { connect } from 'react-redux';
+import * as sendbirdActions from '../redux/modules/sendbird';
 
 class ChannelBoard extends Component {
     constructor(props) {
@@ -28,14 +30,15 @@ class ChannelBoard extends Component {
             this.sb.getOpenChannelInfo("general",(generalChannel) => {
                 console.log("generalChannel: ", generalChannel);
 
-                this.setState({ generalChannel: generalChannel });
+                this.props.sbSetGeneralChan(generalChannel);
+                // this.setState({ generalChannel: generalChannel });
 
                 let callback = (response, error) => {
 
                     console.log("response:", response);
                     if (error) {
                         console.log(error);
-
+                        
                         this.setState({ 
                             hasError: true, 
                             errMsg: JSON.stringify(error) 
@@ -48,12 +51,16 @@ class ChannelBoard extends Component {
                     let isOperator = generalChannel.isOperatorWithUserId(userId);
                     console.log("operators:", generalChannel.operators);
 
-                    this.setState({ 
-                        connected: true,
-                        isAdmin: isOperator,
-                        hasError: false, 
-                        errMsg:"",
-                    });
+                    //redux
+                    this.props.sbConnect();
+                    this.props.sbSetAdmin(isOperator);
+
+                    // this.setState({ 
+                    //     connected: true,
+                    //     isAdmin: isOperator,
+                    //     hasError: false, 
+                    //     errMsg:"",
+                    // });
                 }
 
                 generalChannel.enter(callback);
@@ -85,11 +92,11 @@ class ChannelBoard extends Component {
 
         let content = null;
 
-        if (this.state.connected){
-            if (this.state.isAdmin){
+        if (this.props.sendbird.connected){
+            if (this.props.sendbird.isAdmin){
                 content = <AdminChatApp userId={userId} sb={this.sb} /> ;
             } else{
-                content = <CustomerChatApp userId={userId} sb={this.sb} generalChannel={this.state.generalChannel} handleHide={handleHide}/>;
+                content = <CustomerChatApp userId={userId} sb={this.sb} handleHide={handleHide}/>;
             }
         }else{
             content= <p>Wait for connecting....</p>;
@@ -99,7 +106,7 @@ class ChannelBoard extends Component {
             <div className={"channel-board" + transition} style={{
                 display: display
             }}>
-                <BoardTop handleHide={handleHide} handleDisconnect={this.state.isAdmin? 
+                <BoardTop handleHide={handleHide} handleDisconnect={this.props.sendbird.isAdmin? 
                                                                         null
                                                                         :
                                                                         handleDisconnect
@@ -110,4 +117,25 @@ class ChannelBoard extends Component {
     };
 }
 
-export default ChannelBoard;
+const mapStateToProps = ({ sendbird }) => ({
+    sendbird
+});
+
+const mapDispatchToProps =(dispatch) => {
+    return {
+        sbConnect: () => {
+            dispatch(sendbirdActions.sbConnectAction({}));
+        },
+        sbSetAdmin: (isAdmin)=> {
+            dispatch(sendbirdActions.sbSetAdminAction({isAdmin:isAdmin}));
+        },
+        sbSetGeneralChan: (generalChannel)=>{
+            dispatch(sendbirdActions.sbSetGeneralChanAction({generalChannel:generalChannel}));
+        },
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(ChannelBoard);

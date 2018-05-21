@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ChatBox from '../components/chatbox';
 import BoxTop from '../components/boxtop';
+import { connect } from 'react-redux';
+import * as sendbirdActions from '../redux/modules/sendbird';
 // import { ChatToken } from './mocks/api';
 
 class CustomerChatApp extends Component {
@@ -14,9 +16,9 @@ class CustomerChatApp extends Component {
         this.sb = sb
 
         this.state = {
-            channels: [],
-            channelStates: [],
-            users: [],
+            // channels: [],
+            // channelStates: [],
+            // users: [],
             hasError: false,
             errMsg: "",
         };
@@ -39,8 +41,8 @@ class CustomerChatApp extends Component {
         this.sb.getGroupChannelList((list) => {
             console.log("GROUP CHANNELS: ", list);
 
-            let channels = this.state.channels;
-            let channelStates = this.state.channelStates;
+            let channels = [];
+            let channelStates = [];
 
             list.forEach(channel => {
                 console.log('Private: ', channel);
@@ -55,10 +57,12 @@ class CustomerChatApp extends Component {
             });
 
 
+            this.props.sbSetChans(channels,channelStates);
+
             this.setState({ 
-                channels: channels, 
-                channelStates: 
-                channelStates, 
+                // channels: channels, 
+                // channelStates: 
+                // channelStates, 
                 hasError: false, 
                 errMsg:"",
             });
@@ -69,8 +73,8 @@ class CustomerChatApp extends Component {
 
     onInvited = (channel, inviter, invitees) => {
         //console.log('invited!', channel, inviter);
-        let channels = this.state.channels;
-        let channelStates = this.state.channelStates;
+        let channels = this.props.sendbird.channels;
+        let channelStates = this.props.sendbird.channelStates;
         let channelState = {
             messages: [],
             newMessage: '',
@@ -78,7 +82,9 @@ class CustomerChatApp extends Component {
         };
         channels.push(channel);
         channelStates.push(channelState);
-        this.setState({ channels: channels, channelStates: channelStates })
+
+        this.props.sbSetChans(channels,channelStates);
+        // this.setState({ channels: channels, channelStates: channelStates })
     };
 
     addChannelToList = (channel) => {
@@ -90,18 +96,20 @@ class CustomerChatApp extends Component {
     };
 
     onMessageReceived = (channel, message) => {
-        let id = this.state.channels.findIndex((chan) => {
+        let id = this.props.sendbird.channels.findIndex((chan) => {
             console.log(channel.url, chan.url);
             return channel.url === chan.url;
         });
-        let channelStates = this.state.channelStates;
+        let channelStates = this.props.sendbird.channelStates;
         channelStates[id].messages.push(message._sender.userId + ': ' + message.message);
-        this.setState({ channelStates: channelStates });
+        
+        this.props.sbSetChanStates(channelStates);
+        // this.setState({ channelStates: channelStates });
     };
 
     onUserJoined = (channel, user) => {
         console.log("user joined: ", user.userId);
-        let users = this.state.users;
+        let users = this.props.sendbird.users;
         users.push(user)
     };
 
@@ -111,17 +119,21 @@ class CustomerChatApp extends Component {
 
     onInputKeyDown = event => {
         const id = event.target.id;
-        let channelStates = this.state.channelStates;
+        let channelStates = this.props.sendbird.channelStates;
 
         if (event.key === 'Enter') {
             channelStates[id].submitting = true;
-            this.setState({ channelStates: channelStates });
 
-            let channel = this.state.channels[id];
+            this.props.sbSetChanStates(channelStates);
+            // this.setState({ channelStates: channelStates });
+
+            let channel = this.props.sendbird.channels[id];
             this.sb.sendTextMessage(channel, channelStates[id].newMessage, (message, error) => {
                 if (error) {
                     channelStates[id].submitting = false;
-                    this.setState({ channelStates: channelStates });
+
+                    this.props.sbSetChanStates(channelStates);
+                    // this.setState({ channelStates: channelStates });
                     console.error(error);
                     return;
                 }
@@ -129,11 +141,15 @@ class CustomerChatApp extends Component {
                 channelStates[id].submitting = false;
                 channelStates[id].newMessage = "";
                 channelStates[id].messages.push('me: ' + message.message);
-                this.setState({ channelStates: channelStates });
+
+                this.props.sbSetChanStates(channelStates);
+                // this.setState({ channelStates: channelStates });
             });
         } else {
             channelStates[id].newMessage = channelStates[id].newMessage + event.key;
-            this.setState({ channelStates: channelStates });
+
+            this.props.sbSetChanStates(channelStates);
+            // this.setState({ channelStates: channelStates });
         }
     };
 
@@ -144,10 +160,9 @@ class CustomerChatApp extends Component {
 
     componentWillUnmount = () => {
         console.log('CustomerChat Unmount');
-        const {generalChannel} = this.props;
 
         //Leave general channel to avoid matching again
-        this.sb.openChannelExit(generalChannel, (response, error) => {
+        this.sb.openChannelExit(this.props.sendbird.generalChannel, (response, error) => {
             if (error) {
                 console.error(error);
                 return;
@@ -157,7 +172,7 @@ class CustomerChatApp extends Component {
 
             //Leave all the group channel
 
-            this.state.channels.map((channel, index) => {
+            this.props.sendbird.channels.map((channel, index) => {
                 console.log("channel: ",channel);
 
                 this.sb.groupChannelLeave(channel, (response, error) => {
@@ -170,6 +185,7 @@ class CustomerChatApp extends Component {
 
                     this.sb.disconnect(() => {
                         console.log('disconnected');
+                        this.props.sbDisconnect();
                     })
                 })
 
@@ -191,7 +207,7 @@ class CustomerChatApp extends Component {
             )
         }
 
-        if (this.state.channels.length === 0) {
+        if (this.props.sendbird.channels.length === 0) {
             return (
                 <div>
                     <p>Waiting for your service agent...</p>
@@ -199,10 +215,10 @@ class CustomerChatApp extends Component {
             )
         }
 
-        const boxes = this.state.channels.map((chan, index) => {
+        const boxes = this.props.sendbird.channels.map((chan, index) => {
             console.log("index:", index);
             
-            const state = this.state.channelStates[index];
+            const state = this.props.sendbird.channelStates[index];
 
             if (this.state.idAdmin && !state.show) {
                 return null;
@@ -229,4 +245,32 @@ class CustomerChatApp extends Component {
     }
 }
 
-export default CustomerChatApp;
+const mapStateToProps = ({ sendbird }) => ({
+    sendbird
+});
+
+const mapDispatchToProps =(dispatch) => {
+    return {
+        sbDisconnect: () => {
+            console.log("sbDisconnect"); 
+            dispatch(sendbirdActions.sbDisconnectAction());
+        },
+        sbSetChans: (channels, channelStates) => {
+            console.log("sbSetChans");
+            dispatch(sendbirdActions.sbSetChansAction({
+                channels: channels, 
+                channelStates: channelStates
+            }));
+        },
+        sbSetChanStates: (channelStates) => {
+            console.log("sbSetChanStates");
+            dispatch(sendbirdActions.sbSetChanStatesAction({channelStates:channelStates}));
+        },
+
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(CustomerChatApp);

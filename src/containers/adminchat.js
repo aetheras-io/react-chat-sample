@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ChatBoard from '../components/chatboard';
 import ChannelList from '../components/channellist';
+import { connect } from 'react-redux';
+import * as sendbirdActions from '../redux/modules/sendbird';
 
 class AdminChatApp extends Component {
     constructor(props) {
@@ -12,10 +14,9 @@ class AdminChatApp extends Component {
         this.sb = sb
 
         this.state = {
-            connected: false,
-            channels: [],
-            channelStates: [],
-            users: [],
+            // channels: [],
+            // channelStates: [],
+            // users: [],
             hasError: false,
             errMsg: "",
         };
@@ -38,8 +39,8 @@ class AdminChatApp extends Component {
         this.sb.getGroupChannelList((list) => {
             console.log("GROUP CHANNELS: ", list);
 
-            let channels = this.state.channels;
-            let channelStates = this.state.channelStates;
+            let channels = [];
+            let channelStates = [];
 
             list.forEach(channel => {
                 console.log('Private: ', channel);
@@ -53,11 +54,12 @@ class AdminChatApp extends Component {
                 channelStates.push(channelState);
             });
 
+            this.props.sbSetChans(channels,channelStates);
 
             this.setState({ 
-                channels: channels, 
-                channelStates: 
-                channelStates, 
+                // channels: channels, 
+                // channelStates: 
+                // channelStates, 
                 hasError: false, 
                 errMsg:"",
             });
@@ -68,8 +70,8 @@ class AdminChatApp extends Component {
 
     onInvited = (channel, inviter, invitees) => {
         //console.log('invited!', channel, inviter);
-        let channels = this.state.channels;
-        let channelStates = this.state.channelStates;
+        let channels = this.props.sendbird.channels;
+        let channelStates = this.props.sendbird.channelStates;
         let channelState = {
             messages: [],
             newMessage: '',
@@ -77,7 +79,9 @@ class AdminChatApp extends Component {
         };
         channels.push(channel);
         channelStates.push(channelState);
-        this.setState({ channels: channels, channelStates: channelStates })
+
+        this.props.sbSetChans(channels,channelStates);
+        // this.setState({ channels: channels, channelStates: channelStates })
     };
 
     addChannelToList = (channel) => {
@@ -89,27 +93,29 @@ class AdminChatApp extends Component {
     };
 
     onMessageReceived = (channel, message) => {
-        let id = this.state.channels.findIndex((chan) => {
+        let id = this.props.sendbird.channels.findIndex((chan) => {
             console.log(channel.url, chan.url);
             return channel.url === chan.url;
         });
-        let channelStates = this.state.channelStates;
+        let channelStates = this.props.sendbird.channelStates;
         channelStates[id].messages.push(message._sender.userId + ': ' + message.message);
-        this.setState({ channelStates: channelStates });
+
+        this.props.sbSetChanStates(channelStates);
+        // this.setState({ channelStates: channelStates });
     };
 
     onUserJoined = (channel, user) => {
         console.log("user joined: ", user.userId);
-        let users = this.state.users;
+        let users = this.props.sendbird.users;
         users.push(user)
     };
 
     onUserLeft = (channel, user) => {
         console.log("user left: ", user.userId);
 
-        let channels = this.state.channels;
-        let channelStates = this.state.channelStates;
-        let channelIndex =  this.state.channels.map((chan) => {
+        let channels = this.props.sendbird.channels;
+        let channelStates = this.props.sendbird.channelStates;
+        let channelIndex =  this.props.sendbird.channels.map((chan) => {
                         return chan.createdAt;
                     }).indexOf(channel.createdAt);
 
@@ -121,28 +127,34 @@ class AdminChatApp extends Component {
             }
 
 
-            channels.splice(channelIndex, 1)
-            channelStates.splice(channelIndex, 1)
-            this.setState({ 
-                channels: channels, 
-                channelStates: channelStates
-             });
+            channels.splice(channelIndex, 1);
+            channelStates.splice(channelIndex, 1);
+
+            this.props.sbSetChans(channels,channelStates);
+            
+            // this.setState({ 
+            //     channels: channels, 
+            //     channelStates: channelStates
+            //  });
         })
     };
 
     onInputKeyDown = event => {
         const id = event.target.id;
-        let channelStates = this.state.channelStates;
+        let channelStates = this.props.sendbird.channelStates;
 
         if (event.key === 'Enter') {
             channelStates[id].submitting = true;
-            this.setState({ channelStates: channelStates });
+            this.props.sbSetChanStates(channelStates);
+            // this.setState({ channelStates: channelStates });
 
-            let channel = this.state.channels[id];
+            let channel = this.props.sendbird.channels[id];
             this.sb.sendTextMessage(channel, channelStates[id].newMessage, (message, error) => {
                 if (error) {
                     channelStates[id].submitting = false;
-                    this.setState({ channelStates: channelStates });
+
+                    this.props.sbSetChanStates(channelStates);
+                    // this.setState({ channelStates: channelStates });
                     console.error(error);
                     return;
                 }
@@ -150,11 +162,15 @@ class AdminChatApp extends Component {
                 channelStates[id].submitting = false;
                 channelStates[id].newMessage = "";
                 channelStates[id].messages.push('me: ' + message.message);
-                this.setState({ channelStates: channelStates });
+
+                this.props.sbSetChanStates(channelStates);
+                // this.setState({ channelStates: channelStates });
             });
         } else {
             channelStates[id].newMessage = channelStates[id].newMessage + event.key;
-            this.setState({ channelStates: channelStates });
+
+            this.props.sbSetChanStates(channelStates);
+            // this.setState({ channelStates: channelStates });
         }
     };
 
@@ -166,8 +182,8 @@ class AdminChatApp extends Component {
     onLeaveGroupChannel = (channelIndex) => {
         return event => {
             console.log("Leave channel (index:", channelIndex, ")");
-            let channels = this.state.channels;
-            let channelStates = this.state.channelStates;
+            let channels = this.props.sendbird.channels;
+            let channelStates = this.props.sendbird.channelStates;
             let channel = channels[channelIndex]
 
             this.sb.groupChannelLeave(channel, (response, error) => {
@@ -179,10 +195,12 @@ class AdminChatApp extends Component {
 
                 channels.splice(channelIndex, 1)
                 channelStates.splice(channelIndex, 1)
-                this.setState({ 
-                    channels: channels, 
-                    channelStates: channelStates
-                 });
+
+                this.props.sbSetChans(channels,channelStates);
+                // this.setState({ 
+                //     channels: channels, 
+                //     channelStates: channelStates
+                //  });
             })
         }
     };
@@ -190,27 +208,29 @@ class AdminChatApp extends Component {
     onHideChatBox = (index) => {
         return event => {
             console.log("Hide Chatbox (index:", index, ")");
-            let states = this.state.channelStates;
+            let states = this.props.sendbird.channelStates;
             let state = states[index]
             state["show"] = false;
             
-            this.setState({
-                channelStates: states
-            });
+            this.props.sbSetChanStates(states);
+            // this.setState({
+            //     channelStates: states
+            // });
         }
     };
 
     handleClickOnItem = (e, index) => {
-        const chan = this.state.channels[index];
+        const chan = this.props.sendbird.channels[index];
         console.log("handleClickOnItem:", chan.name);
 
-        let states = this.state.channelStates;
+        let states = this.props.sendbird.channelStates;
         let state = states[index]
         state["show"] = true;
         
-        this.setState({
-            channelStates: states
-        });
+        this.props.sbSetChanStates(states);
+        // this.setState({
+        //     channelStates: states
+        // });
 
     }
 
@@ -218,6 +238,7 @@ class AdminChatApp extends Component {
         console.log('AdminChat Unmount');
         this.sb.disconnect(() => {
             console.log('disconnected');
+            this.props.sbDisconnect();
         })
     };
 
@@ -235,7 +256,7 @@ class AdminChatApp extends Component {
             )
         }
 
-        if (this.state.channels.length === 0) {
+        if (this.props.sendbird.channels.length === 0) {
             return (
                 <div>
                     <p> {'(connected as ' + userId + ')'}</p>
@@ -243,10 +264,10 @@ class AdminChatApp extends Component {
             )
         }
 
-        const boxes = this.state.channels.map((chan, index) => {
+        const boxes = this.props.sendbird.channels.map((chan, index) => {
             console.log("index:", index);
             
-            const state = this.state.channelStates[index];
+            const state = this.props.sendbird.channelStates[index];
 
             if (!state.show) {
                 return null;
@@ -258,12 +279,12 @@ class AdminChatApp extends Component {
         return (
             <div>
                 <p>Logged in as {userId}</p>
-                <ChannelList data={this.state.channels} onClick={this.handleClickOnItem}/>
+                <ChannelList data={this.props.sendbird.channels} onClick={this.handleClickOnItem}/>
                
 
                 <div className='chat-section' style={{
                     right: '280px',
-                    width:  this.state.channels.length * 300 + 'px',
+                    width:  this.props.sendbird.channels.length * 300 + 'px',
                 }}>
                     {boxes}
                 </div>
@@ -272,4 +293,32 @@ class AdminChatApp extends Component {
     }
 }
 
-export default AdminChatApp;
+const mapStateToProps = ({ sendbird }) => ({
+    sendbird
+});
+
+const mapDispatchToProps =(dispatch) => {
+    return {
+        sbDisconnect: () => {
+            console.log("sbDisconnect"); 
+            dispatch(sendbirdActions.sbDisconnectAction());
+        },
+        sbSetChans: (channels, channelStates) => {
+            console.log("sbSetChans");
+            dispatch(sendbirdActions.sbSetChansAction({
+                channels: channels, 
+                channelStates: channelStates
+            }));
+        },
+        sbSetChanStates: (channelStates) => {
+            console.log("sbSetChanStates");
+            dispatch(sendbirdActions.sbSetChanStatesAction({channelStates}));
+        },
+
+    };
+};
+
+export default connect(
+    mapStateToProps,
+    mapDispatchToProps
+)(AdminChatApp);
