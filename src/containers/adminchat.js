@@ -14,169 +14,9 @@ class AdminChatApp extends Component {
         this.sb = sb
 
         this.state = {
-            // channels: [],
-            // channelStates: [],
-            // users: [],
             hasError: false,
             errMsg: "",
         };
-
-        this.init()
-    };
-
-    init = () => {
-        console.log('init');
-
-        //listen to invites
-        this.sb.createHandler(
-            this.onInvited,
-            this.onMessageReceived,
-            this.onUserJoined,
-            this.onUserLeft,
-        )
-
-        //Show participated group channels
-        this.sb.getGroupChannelList((list) => {
-            console.log("GROUP CHANNELS: ", list);
-
-            let channels = [];
-            let channelStates = [];
-
-            list.forEach(channel => {
-                console.log('Private: ', channel);
-
-                let channelState = {
-                    messages: [],
-                    newMessage: '',
-                    submitting: false,
-                };
-                channels.push(channel);
-                channelStates.push(channelState);
-            });
-
-            this.props.sbSetChans(channels,channelStates);
-
-            this.setState({ 
-                // channels: channels, 
-                // channelStates: 
-                // channelStates, 
-                hasError: false, 
-                errMsg:"",
-            });
-        });
-
-
-    };
-
-    onInvited = (channel, inviter, invitees) => {
-        //console.log('invited!', channel, inviter);
-        let channels = this.props.sendbird.channels;
-        let channelStates = this.props.sendbird.channelStates;
-        let channelState = {
-            messages: [],
-            newMessage: '',
-            submitting: false,
-        };
-        channels.push(channel);
-        channelStates.push(channelState);
-
-        this.props.sbSetChans(channels,channelStates);
-        // this.setState({ channels: channels, channelStates: channelStates })
-    };
-
-    addChannelToList = (channel) => {
-
-    }
-
-    onMessageReceived = (channel, message) => {
-        console.log('Message: ', channel, message);
-    };
-
-    onMessageReceived = (channel, message) => {
-        let id = this.props.sendbird.channels.findIndex((chan) => {
-            console.log(channel.url, chan.url);
-            return channel.url === chan.url;
-        });
-        let channelStates = this.props.sendbird.channelStates;
-        channelStates[id].messages.push(message._sender.userId + ': ' + message.message);
-
-        this.props.sbSetChanStates(channelStates);
-        // this.setState({ channelStates: channelStates });
-    };
-
-    onUserJoined = (channel, user) => {
-        console.log("user joined: ", user.userId);
-        let users = this.props.sendbird.users;
-        users.push(user)
-    };
-
-    onUserLeft = (channel, user) => {
-        console.log("user left: ", user.userId);
-
-        let channels = this.props.sendbird.channels;
-        let channelStates = this.props.sendbird.channelStates;
-        let channelIndex =  this.props.sendbird.channels.map((chan) => {
-                        return chan.createdAt;
-                    }).indexOf(channel.createdAt);
-
-
-        this.sb.groupChannelLeave(channel, (response, error) => {
-            if (error) {
-                console.error(error);
-                return;
-            }
-
-
-            channels.splice(channelIndex, 1);
-            channelStates.splice(channelIndex, 1);
-
-            this.props.sbSetChans(channels,channelStates);
-            
-            // this.setState({ 
-            //     channels: channels, 
-            //     channelStates: channelStates
-            //  });
-        })
-    };
-
-    onInputKeyDown = event => {
-        const id = event.target.id;
-        let channelStates = this.props.sendbird.channelStates;
-
-        if (event.key === 'Enter') {
-            channelStates[id].submitting = true;
-            this.props.sbSetChanStates(channelStates);
-            // this.setState({ channelStates: channelStates });
-
-            let channel = this.props.sendbird.channels[id];
-            this.sb.sendTextMessage(channel, channelStates[id].newMessage, (message, error) => {
-                if (error) {
-                    channelStates[id].submitting = false;
-
-                    this.props.sbSetChanStates(channelStates);
-                    // this.setState({ channelStates: channelStates });
-                    console.error(error);
-                    return;
-                }
-
-                channelStates[id].submitting = false;
-                channelStates[id].newMessage = "";
-                channelStates[id].messages.push('me: ' + message.message);
-
-                this.props.sbSetChanStates(channelStates);
-                // this.setState({ channelStates: channelStates });
-            });
-        } else {
-            channelStates[id].newMessage = channelStates[id].newMessage + event.key;
-
-            this.props.sbSetChanStates(channelStates);
-            // this.setState({ channelStates: channelStates });
-        }
-    };
-
-    onInviteUser = event => {
-        console.log(event.target.value);
-        this.sb.createPrivateChannel([event.target.value], 'private chat 1', (a) => { console.log(a); });
     };
 
     onLeaveGroupChannel = (channelIndex) => {
@@ -197,10 +37,6 @@ class AdminChatApp extends Component {
                 channelStates.splice(channelIndex, 1)
 
                 this.props.sbSetChans(channels,channelStates);
-                // this.setState({ 
-                //     channels: channels, 
-                //     channelStates: channelStates
-                //  });
             })
         }
     };
@@ -213,9 +49,6 @@ class AdminChatApp extends Component {
             state["show"] = false;
             
             this.props.sbSetChanStates(states);
-            // this.setState({
-            //     channelStates: states
-            // });
         }
     };
 
@@ -228,24 +61,12 @@ class AdminChatApp extends Component {
         state["show"] = true;
         
         this.props.sbSetChanStates(states);
-        // this.setState({
-        //     channelStates: states
-        // });
 
     }
 
-    componentWillUnmount = () => {
-        console.log('AdminChat Unmount');
-        this.sb.disconnect(() => {
-            console.log('disconnected');
-            this.props.sbDisconnect();
-        })
-    };
-
     render() {
+        const {onInputKeyDown} = this.props;
         console.log("state:", this.state);
-        const {userId} = this.props;
-
 
         if (this.state.hasError) {
             return (
@@ -259,7 +80,7 @@ class AdminChatApp extends Component {
         if (this.props.sendbird.channels.length === 0) {
             return (
                 <div>
-                    <p> {'(connected as ' + userId + ')'}</p>
+                    <p> {'(connected as ' + this.props.user.userId + ')'}</p>
                 </div>
             )
         }
@@ -273,12 +94,12 @@ class AdminChatApp extends Component {
                 return null;
             }
 
-            return <ChatBoard name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={this.onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />;
+            return <ChatBoard isAdmin={this.props.sendbird.isAdmin} name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />;
         });
 
         return (
             <div>
-                <p>Logged in as {userId}</p>
+                <p>Logged in as {this.props.user.userId}</p>
                 <ChannelList data={this.props.sendbird.channels} onClick={this.handleClickOnItem}/>
                
 
@@ -293,16 +114,12 @@ class AdminChatApp extends Component {
     }
 }
 
-const mapStateToProps = ({ sendbird }) => ({
-    sendbird
+const mapStateToProps = ({ user, sendbird }) => ({
+    user, sendbird
 });
 
 const mapDispatchToProps =(dispatch) => {
     return {
-        sbDisconnect: () => {
-            console.log("sbDisconnect"); 
-            dispatch(sendbirdActions.sbDisconnectAction());
-        },
         sbSetChans: (channels, channelStates) => {
             console.log("sbSetChans");
             dispatch(sendbirdActions.sbSetChansAction({

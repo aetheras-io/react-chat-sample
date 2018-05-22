@@ -1,15 +1,17 @@
 import React from 'react';
 
 const BoardTop = props => {
-    const {handleHide , handleDisconnect} = props;
+    const {isAdmin, title,  handleHide , handleDisconnect} = props;
+
+    let titleText = title ? title : "React Chat";
 
     return (
         <div className='board-top'>
             <div className='title'>
-                React Chat
+                {titleText}
             </div>
  
-            {handleDisconnect ?
+            {!isAdmin ?
                 (
                     <div style={{
                         float:'right',
@@ -21,16 +23,13 @@ const BoardTop = props => {
                 null
             }
 
-            {handleHide ?
-                <div style={{
-                            float:'right',
-                            cursor: 'pointer',
-                        }} onClick={handleHide}>
-                    <i className="material-icons">keyboard_arrow_down</i>
-                </div> 
-                :
-                null
-            }
+            <div style={{
+                        float:'right',
+                        cursor: 'pointer',
+                    }} onClick={handleHide}>
+                <i className="material-icons">keyboard_arrow_down</i>
+            </div> 
+
         </div>
     );
 };

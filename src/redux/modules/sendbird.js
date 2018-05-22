@@ -23,7 +23,7 @@ export default function reducer(state = initialState, action) {
     switch (action.type) {
         case SB_CONNECT:
             console.log('SB_CONNECT STATE');
-            return { ...state, connected: true, isAdmin: action.payload.isAdmin };
+            return { ...state, connected: true, isAdmin: action.payload.isAdmin, generalChannel: action.payload.generalChannel, channels: action.payload.channels, channelStates: action.payload.channelStates };
 
         case SB_DISCONNECT:
             console.log('SB_DISCONNECT STATE');

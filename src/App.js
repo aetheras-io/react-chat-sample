@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import * as windowActions from './redux/modules/window';
-import * as userActions from './redux/modules/user';
 import './App.css';
 import ChannelBoard from './containers/channelboard';
+
+
+const WIDGET_FADE_IN = 'widget ic-connected sb-fade-in';
+const WIDGET_FADE_OUT= 'widget ic-connected sb-fade-out';
 
 class App extends Component {
     constructor(props){
@@ -21,22 +24,17 @@ class App extends Component {
         }
     }
 
-    handleHide = () => {
-        console.log("handleHide");
-        this.props.hideWindow();
-    }
-
     render() {
         console.log("props:", this.props);
 
         let icon = null;
 
         if (this.props.user.login && this.props.window.loaded){
-            icon=  <div className={ 'widget ic-connected sb-fade-out' } onClick={this.handleClick} style={{
+            icon=  <div className={ WIDGET_FADE_OUT } onClick={this.handleClick} style={{
                 display: 'none'}}></div>;
 
         }else{
-            icon=  <div className={ 'widget ic-connected sb-fade-in' } onClick={this.handleClick} style={{
+            icon=  <div className={ WIDGET_FADE_IN } onClick={this.handleClick} style={{
                 display: 'block'}}></div>;
         }
 
@@ -44,7 +42,7 @@ class App extends Component {
             <div id="sb_widget" >
                 {icon}
                 {this.props.user.login ? 
-                    <ChannelBoard display={this.props.window.loaded ?'block' : 'none'} userId={this.props.user.userId} nickName={this.props.user.nickName} handleHide={this.handleHide} handleDisconnect={this.props.disconnectUser}/>
+                    <ChannelBoard />
                     :
                     null
                 }
@@ -62,14 +60,6 @@ const mapDispatchToProps =(dispatch) => {
         showWindow: () => {
             dispatch(windowActions.windowLoadAction({}));
         },
-
-        hideWindow: () => {
-            dispatch(windowActions.windowUnloadAction());
-        },
-
-        disconnectUser: () => {
-            dispatch(userActions.userDisconnectAction());            
-        }
     };
 };
 
