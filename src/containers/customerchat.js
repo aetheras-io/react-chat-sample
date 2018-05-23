@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import ChatBox from '../components/chatbox';
-import BoxTop from '../components/boxtop';
+import ChatBoard from '../components/chatboard';
 import { connect } from 'react-redux';
 // import { ChatToken } from './mocks/api';
 
@@ -10,24 +9,12 @@ class CustomerChatApp extends Component {
 
         console.log(props);
 
-        this.state = {
-            hasError: false,
-            errMsg: "",
-        };
+        this.state = {};
     };
 
     render() {
-        const {onInputKeyDown} = this.props;
+        const {sb} = this.props;
         console.log("state:", this.state);
-
-        if (this.state.hasError) {
-            return (
-                <div>
-                    <p>Error has occured: {this.state.errMsg}</p>
-                    <button id="retryBtn" onClick={this.init}>Retry</button>
-                </div>
-            )
-        }
 
         if (this.props.sendbird.channels.length === 0) {
             return (
@@ -43,10 +30,7 @@ class CustomerChatApp extends Component {
             const state = this.props.sendbird.channelStates[index];
 
             return ( 
-                <div  key={index}>
-                    <BoxTop isAdmin={this.props.sendbird.isAdmin} name={'Logged in as ' + this.props.user.userId}  />
-                    <ChatBox name={chan.name} url={chan.url} id={index} onInputKeydown={onInputKeyDown} {...state} />
-                </div>
+                <ChatBoard sb={sb} key={index} id={index} isAdmin={this.props.sendbird.isAdmin} name={'Logged in as ' + this.props.user.userId} {...state}/>
             );
         });
 

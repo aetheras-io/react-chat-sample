@@ -14,8 +14,6 @@ class AdminChatApp extends Component {
         this.sb = sb
 
         this.state = {
-            hasError: false,
-            errMsg: "",
         };
     };
 
@@ -65,17 +63,16 @@ class AdminChatApp extends Component {
     }
 
     render() {
-        const {onInputKeyDown} = this.props;
-        console.log("state:", this.state);
+        console.log("props:", this.props);
 
-        if (this.state.hasError) {
-            return (
-                <div>
-                    <p>Error has occured: {this.state.errMsg}</p>
-                    <button id="retryBtn" onClick={this.init}>Retry</button>
-                </div>
-            )
-        }
+        // if (this.state.hasError) {
+        //     return (
+        //         <div>
+        //             <p>Error has occured: {this.state.errMsg}</p>
+        //             <button id="retryBtn" onClick={this.init}>Retry</button>
+        //         </div>
+        //     )
+        // }
 
         if (this.props.sendbird.channels.length === 0) {
             return (
@@ -94,7 +91,7 @@ class AdminChatApp extends Component {
                 return null;
             }
 
-            return <ChatBoard isAdmin={this.props.sendbird.isAdmin} name={chan.name} key={index} url={chan.url} id={index} onInputKeydown={onInputKeyDown} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state} />;
+            return <ChatBoard sb={this.sb} isAdmin={this.props.sendbird.isAdmin} name={chan.name} key={index} url={chan.url} id={index} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state}/>;
         });
 
         return (

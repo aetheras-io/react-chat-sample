@@ -8,8 +8,8 @@ import * as sendbirdActions from '../redux/modules/sendbird';
 import * as userActions from '../redux/modules/user';
 import * as windowActions from '../redux/modules/window';
 
-const FADE_IN = "channel-board sb-fade-in";
-const FADE_OUT = "channel-board sb-fade-out";
+const CHANBOARD_FADE_IN = "channel-board sb-fade-in";
+const CHANBOARD_FADE_OUT = "channel-board sb-fade-out";
 
 class ChannelBoard extends Component {
     constructor(props) {
@@ -195,42 +195,6 @@ class ChannelBoard extends Component {
         }
     };
 
-    onInputKeyDown = event => {
-        const id = event.target.id;
-        let channelStates = this.props.sendbird.channelStates;
-
-        if (event.key === 'Enter') {
-            channelStates[id].submitting = true;
-
-            this.props.sbSetChanStates(channelStates);
-            // this.setState({ channelStates: channelStates });
-
-            let channel = this.props.sendbird.channels[id];
-            this.sb.sendTextMessage(channel, channelStates[id].newMessage, (message, error) => {
-                if (error) {
-                    channelStates[id].submitting = false;
-
-                    this.props.sbSetChanStates(channelStates);
-                    // this.setState({ channelStates: channelStates });
-                    console.error(error);
-                    return;
-                }
-
-                channelStates[id].submitting = false;
-                channelStates[id].newMessage = "";
-                channelStates[id].messages.push('me: ' + message.message);
-
-                this.props.sbSetChanStates(channelStates);
-                // this.setState({ channelStates: channelStates });
-            });
-        } else {
-            channelStates[id].newMessage = channelStates[id].newMessage + event.key;
-
-            this.props.sbSetChanStates(channelStates);
-            // this.setState({ channelStates: channelStates });
-        }
-    };
-
     onInviteUser = event => {
         console.log(event.target.value);
         this.sb.createPrivateChannel([event.target.value], 'private chat 1', (a) => { console.log(a); });
@@ -239,15 +203,15 @@ class ChannelBoard extends Component {
     render() {
         console.log("props", this.props);
 
-        let className =  this.props.window.loaded ? FADE_IN : FADE_OUT; 
+        let className =  this.props.window.loaded ? CHANBOARD_FADE_IN : CHANBOARD_FADE_OUT; 
 
         let content = null;
 
         if (this.props.sendbird.connected){
             if (this.props.sendbird.isAdmin){
-                content = <AdminChatApp sb={this.sb} onInputKeyDown={this.onInputKeyDown}/> ;
+                content = <AdminChatApp sb={this.sb} /> ;
             } else{
-                content = <CustomerChatApp onInputKeyDown={this.onInputKeyDown}/>;
+                content = <CustomerChatApp sb={this.sb}/>;
             }
         }else{
             content= <p>Wait for connecting....</p>;
