@@ -59,7 +59,9 @@
   document.getElementById("connectUserForm").onsubmit = (event) => {
     var userId = document.getElementById("useridText").value
     var nickName = document.getElementById("nicknameText").value
+    console.log(reactchat)
     try {
+      reactchat.setOnError(console.log)
       reactchat.connectUser(userId, nickName)
     }
     catch (err) {

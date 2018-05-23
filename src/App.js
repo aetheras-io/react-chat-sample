@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import * as windowActions from './redux/modules/window';
+import {windowLoadAction} from './redux/modules/window';
 import './App.css';
 import ChannelBoard from './containers/channelboard';
 
@@ -26,6 +26,8 @@ class App extends Component {
 
     render() {
         console.log("props:", this.props);
+
+        this.props.window.onError("hello error");
 
         let icon = null;
 
@@ -58,7 +60,7 @@ const mapStateToProps = ({ window, user }) => ({
 const mapDispatchToProps =(dispatch) => {
     return {
         showWindow: () => {
-            dispatch(windowActions.windowLoadAction({}));
+            dispatch(windowLoadAction({}));
         },
     };
 };

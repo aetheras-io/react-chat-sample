@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import ChatBoard from '../components/chatboard';
+import ChatBox from '../components/chatbox';
 import ChannelList from '../components/channellist';
 import { connect } from 'react-redux';
-import * as sendbirdActions from '../redux/modules/sendbird';
+import { sbSetChansAction,sbSetChanStatesAction} from '../redux/modules/sendbird';
 
 class AdminChatApp extends Component {
     constructor(props) {
@@ -63,16 +63,8 @@ class AdminChatApp extends Component {
     }
 
     render() {
-        console.log("props:", this.props);
-
-        // if (this.state.hasError) {
-        //     return (
-        //         <div>
-        //             <p>Error has occured: {this.state.errMsg}</p>
-        //             <button id="retryBtn" onClick={this.init}>Retry</button>
-        //         </div>
-        //     )
-        // }
+        console.log("AdminChatApp rendering!!");
+        // console.log("props:", this.props);
 
         if (this.props.sendbird.channels.length === 0) {
             return (
@@ -91,7 +83,27 @@ class AdminChatApp extends Component {
                 return null;
             }
 
-            return <ChatBoard sb={this.sb} isAdmin={this.props.sendbird.isAdmin} name={chan.name} key={index} url={chan.url} id={index} onCloseClick={this.onLeaveGroupChannel(index)} onHideChatBox={this.onHideChatBox(index)} {...state}/>;
+            return ( 
+                <ChatBox 
+                    sb={this.sb} 
+                    key={index} 
+                    id={index} 
+                    isAdmin={this.props.sendbird.isAdmin} 
+                    name={chan.name}
+                    url={chan.url}
+                    channel={chan} 
+                    channelState={this.props.sendbird.channelStates[index]}
+                    onCloseClick={this.onLeaveGroupChannel(index)} 
+                    onHideChatBox={this.onHideChatBox(index)}
+                    submitChannelState={
+                        (id, state)=> {
+                            let states = this.props.sendbird.channelStates;
+                            states[id] = state;
+                            this.props.sbSetChanStates(states);
+                        }
+                    }
+                />
+            );
         });
 
         return (
@@ -119,14 +131,14 @@ const mapDispatchToProps =(dispatch) => {
     return {
         sbSetChans: (channels, channelStates) => {
             console.log("sbSetChans");
-            dispatch(sendbirdActions.sbSetChansAction({
+            dispatch(sbSetChansAction({
                 channels: channels, 
                 channelStates: channelStates
             }));
         },
         sbSetChanStates: (channelStates) => {
             console.log("sbSetChanStates");
-            dispatch(sendbirdActions.sbSetChanStatesAction({channelStates}));
+            dispatch(sbSetChanStatesAction({channelStates}));
         },
 
     };

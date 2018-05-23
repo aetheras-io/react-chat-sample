@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
-import { connect } from 'react-redux';
-import * as sendbirdActions from '../redux/modules/sendbird';
+import BoxTop from './boxtop';
 
 class ChatBox extends Component {
     constructor(props) {
@@ -8,93 +7,94 @@ class ChatBox extends Component {
 
         console.log(props);
 
-        const { sb } = this.props;
+        const { sb , channel, channelState } = this.props;
         this.sb = sb
 
         this.state = {
+            channel: channel,
+            channelState : channelState,
         };
     };
 
     onInputKeyDown = (event) => {
         console.log("onInputKeyDown");
-        const id = event.target.id;
-        let channelStates = this.props.sendbird.channelStates;
-    
+
+        const {id, submitChannelState} = this.props;
+
+        //const id = event.target.id;
+        let cState = this.state.channelState;
+
         if (event.key === 'Enter') {
-            channelStates[id].submitting = true;
+            cState.submitting = true;
     
-            this.props.sbSetChanStates(channelStates);
+            // this.props.sbSetChanStates({channelStates});
+            this.setState({
+                channelState: cState
+            });
     
-            let channel = this.props.sendbird.channels[id];
-            this.sb.sendTextMessage(channel, channelStates[id].newMessage, (message, error) => {
+            this.sb.sendTextMessage(this.state.channel, this.state.channelState.newMessage, (message, error) => {
+                cState = this.state.channelState;
+                cState.submitting = false;
+
                 if (error) {
-                    channelStates[id].submitting = false;
-    
-                    this.props.sbSetChanStates(channelStates);
+                    // this.props.sbSetChanStates({channelStates});
+                    this.setState({
+                        channelState: cState
+                    });
     
                     console.error(error);
                     return;
                 }
     
-                channelStates[id].submitting = false;
-                channelStates[id].newMessage = "";
-                channelStates[id].messages.push('me: ' + message.message);
+                cState.newMessage = "";
+                cState.messages.push('me: ' + message.message);
     
-                this.props.sbSetChanStates(channelStates);
+                submitChannelState(id, cState);
             });
         } else {
-            channelStates[id].newMessage = channelStates[id].newMessage + event.key;
+            cState.newMessage = cState.newMessage + event.key;
     
-            this.props.sbSetChanStates(channelStates);
+            //this.props.sbSetChanStates(channelStates);
+            //#TODO: Store in its own state
+            this.setState({
+                channelState: cState
+            });
         }
     };
 
     render() {
-        const { id, messages, newMessage, submitting} = this.props;
+        const { id , isAdmin, name, onCloseClick, onHideChatBox } = this.props;
+        //#TODO: get channel related info from props
+        console.log("Chatbox[", id, "] rendering!");
         console.log("props: ", this.props);
 
-        const messageList = messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
+        const messageList = this.state.channelState.messages.map((message, index) => <ul key={index} className="messages">{message}</ul>);
         return (
-            <div className='content'>
-                <div className='message-content'>
-                    <div className='message-list'>
-                        {messageList}
+            <div className={isAdmin ? 'chat-board' : ''}>
+                <BoxTop isAdmin= {isAdmin} name={name} handleLeave={onCloseClick} handleClose={onHideChatBox} />
+                <div className='content'>
+                    <div className='message-content'>
+                        <div className='message-list'>
+                            {messageList}
+                        </div>
                     </div>
+                    <input
+                        className="input"
+                        autoFocus
+                        type="text"
+                        name="message"
+                        id={id}
+                        value={this.state.channelState.newMessage}
+                        disabled={this.state.channelState.submitting}
+                        onKeyPress={this.onInputKeyDown}
+                        style={{ display: 'inline-block' }}
+                        placeholder='Type-in your message'
+                    />
+                    {this.state.channelState.submitting ? <p style={{ display: 'inline-block' }}> submitting...</p> : null}
                 </div>
-                <input
-                    className="input"
-                    autoFocus
-                    type="text"
-                    name="message"
-                    id={id}
-                    value={newMessage}
-                    disabled={submitting}
-                    onKeyPress={this.onInputKeyDown}
-                    style={{ display: 'inline-block' }}
-                    placeholder='Type-in your message'
-                />
-                {submitting ? <p style={{ display: 'inline-block' }}> submitting...</p> : null}
             </div>
         );
     };
 } 
 
-
-const mapStateToProps = ({ sendbird }) => ({
-    sendbird
-});
-
-const mapDispatchToProps =(dispatch) => {
-    return {
-        sbSetChanStates: (channelStates) => {
-            console.log("sbSetChanStates");
-            dispatch(sendbirdActions.sbSetChanStatesAction({channelStates}));
-        },
-
-    };
-};
-
-export default connect(
-    mapStateToProps,
-    mapDispatchToProps
-)(ChatBox);
+export default ChatBox;

@@ -4,9 +4,15 @@ import AdminChatApp from './adminchat';
 import CustomerChatApp from './customerchat';
 import ChatAPI from '../utils/chatapi';
 import { connect } from 'react-redux';
-import * as sendbirdActions from '../redux/modules/sendbird';
-import * as userActions from '../redux/modules/user';
-import * as windowActions from '../redux/modules/window';
+import {
+    sbConnectAction, 
+    sbDisconnectAction, 
+    sbSetGeneralChanAction, 
+    sbSetChansAction, 
+    sbSetChanStatesAction,
+} from '../redux/modules/sendbird';
+import {userDisconnectAction} from '../redux/modules/user';
+import {windowUnloadAction} from '../redux/modules/window';
 
 const CHANBOARD_FADE_IN = "channel-board sb-fade-in";
 const CHANBOARD_FADE_OUT = "channel-board sb-fade-out";
@@ -201,7 +207,8 @@ class ChannelBoard extends Component {
     };
 
     render() {
-        console.log("props", this.props);
+        console.log("ChannelBoard rendering!");
+        // console.log("props", this.props);
 
         let className =  this.props.window.loaded ? CHANBOARD_FADE_IN : CHANBOARD_FADE_OUT; 
 
@@ -242,7 +249,7 @@ const mapStateToProps = ({ user, window, sendbird }) => ({
 const mapDispatchToProps =(dispatch) => {
     return {
         sbConnect: (isAdmin, generalChannel, channels, channelStates) => {
-            dispatch(sendbirdActions.sbConnectAction({
+            dispatch(sbConnectAction({
                 isAdmin:isAdmin,
                 generalChannel:generalChannel,
                 channels: channels, 
@@ -251,27 +258,27 @@ const mapDispatchToProps =(dispatch) => {
         },
         sbDisconnect: () => {
             console.log("sbDisconnect"); 
-            dispatch(sendbirdActions.sbDisconnectAction());
+            dispatch(sbDisconnectAction());
         },
         sbSetGeneralChan: (generalChannel)=>{
-            dispatch(sendbirdActions.sbSetGeneralChanAction({generalChannel:generalChannel}));
+            dispatch(sbSetGeneralChanAction({generalChannel:generalChannel}));
         },
         sbSetChans: (channels, channelStates) => {
             console.log("sbSetChans");
-            dispatch(sendbirdActions.sbSetChansAction({
+            dispatch(sbSetChansAction({
                 channels: channels, 
                 channelStates: channelStates
             }));
         },
         sbSetChanStates: (channelStates) => {
             console.log("sbSetChanStates");
-            dispatch(sendbirdActions.sbSetChanStatesAction({channelStates}));
+            dispatch(sbSetChanStatesAction({channelStates}));
         },
         disconnectUser: () => {
-            dispatch(userActions.userDisconnectAction());            
+            dispatch(userDisconnectAction());            
         },
         hideWindow: () => {
-            dispatch(windowActions.windowUnloadAction());
+            dispatch(windowUnloadAction());
         }
     };
 };

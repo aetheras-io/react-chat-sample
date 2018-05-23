@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
-import ChatBoard from '../components/chatboard';
+import ChatBox from '../components/chatbox';
 import { connect } from 'react-redux';
+import { sbSetChanStatesAction} from '../redux/modules/sendbird';
 // import { ChatToken } from './mocks/api';
 
 class CustomerChatApp extends Component {
@@ -9,12 +10,15 @@ class CustomerChatApp extends Component {
 
         console.log(props);
 
+        const { sb } = this.props;
+        this.sb = sb
+
         this.state = {};
     };
 
     render() {
-        const {sb} = this.props;
-        console.log("state:", this.state);
+        console.log("CustomerChatApp rendering!");
+        // console.log("state:", this.state);
 
         if (this.props.sendbird.channels.length === 0) {
             return (
@@ -26,11 +30,24 @@ class CustomerChatApp extends Component {
 
         const boxes = this.props.sendbird.channels.map((chan, index) => {
             console.log("index:", index);
-            
-            const state = this.props.sendbird.channelStates[index];
 
             return ( 
-                <ChatBoard sb={sb} key={index} id={index} isAdmin={this.props.sendbird.isAdmin} name={'Logged in as ' + this.props.user.userId} {...state}/>
+                <ChatBox 
+                    sb={this.sb} 
+                    key={index} 
+                    id={index} 
+                    isAdmin={this.props.sendbird.isAdmin} 
+                    name={'Logged in as ' + this.props.user.userId} 
+                    channel={chan} 
+                    channelState={this.props.sendbird.channelStates[index]}
+                    submitChannelState={
+                        (id, state)=> {
+                            let states = this.props.sendbird.channelStates;
+                            states[id] = state;
+                            this.props.sbSetChanStates(states);
+                        }
+                    }
+                />
             );
         });
 
@@ -51,6 +68,17 @@ const mapStateToProps = ({ user, sendbird }) => ({
     user, sendbird
 });
 
+const mapDispatchToProps =(dispatch) => {
+    return {
+        sbSetChanStates: (channelStates) => {
+            console.log("sbSetChanStates");
+            dispatch(sbSetChanStatesAction({channelStates}));
+        },
+
+    };
+};
+
 export default connect(
-    mapStateToProps
+    mapStateToProps,
+    mapDispatchToProps
 )(CustomerChatApp);
