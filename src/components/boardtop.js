@@ -17,7 +17,7 @@ const BoardTop = props => {
                         float:'right',
                         cursor: 'pointer',
                     }} onClick={handleDisconnect}>
-                        <i className="material-icons">directions_run</i>
+                        <i className="material-icons">clear</i>
                     </div>
                 ) :
                 null

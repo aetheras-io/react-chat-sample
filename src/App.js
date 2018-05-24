@@ -5,8 +5,12 @@ import './App.css';
 import ChannelBoard from './containers/channelboard';
 
 
-const WIDGET_FADE_IN = 'widget ic-connected sb-fade-in';
-const WIDGET_FADE_OUT= 'widget ic-connected sb-fade-out';
+// const WIDGET_FADE_IN = 'widget ic-connected sb-fade-in';
+// const WIDGET_FADE_OUT= 'widget ic-connected sb-fade-out';
+
+const WIDGET_FADE_IN = 'widget sb-fade-in';
+const WIDGET_FADE_OUT= 'widget sb-fade-out';
+
 
 class App extends Component {
     constructor(props){
@@ -28,14 +32,25 @@ class App extends Component {
         console.log("props:", this.props);
 
         let icon = null;
+        const mIcon = <i className='material-icons' style={{
+            fontSize: '36px',
+            marginLeft:'12px',
+            marginTop: '12px'
+        }}> chat</i>;
+
 
         if (this.props.user.login && this.props.window.loaded){
             icon=  <div className={ WIDGET_FADE_OUT } onClick={this.handleClick} style={{
-                display: 'none'}}></div>;
+                display: 'none'
+            }}>
+                {mIcon}
+            </div>;
 
         }else{
             icon=  <div className={ WIDGET_FADE_IN } onClick={this.handleClick} style={{
-                display: 'block'}}></div>;
+                display: 'block'}}>
+                    {mIcon}
+                </div>;
         }
 
         return (

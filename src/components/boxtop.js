@@ -15,7 +15,7 @@ const BoxTop = props => {
                     float:'right',
                         cursor: 'pointer',
                     }} onClick={handleLeave}>
-                    <i className="material-icons">directions_run</i>
+                    <i className="material-icons">clear</i>
                 </div>
             :null }
 
@@ -24,7 +24,7 @@ const BoxTop = props => {
                             float:'right',
                             cursor: 'pointer',
                         }} onClick={handleClose}>
-                    <i className="material-icons">clear</i>
+                    <i className="material-icons">keyboard_arrow_down</i>
                 </div>
             :null }
 
