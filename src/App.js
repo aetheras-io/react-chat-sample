@@ -27,8 +27,6 @@ class App extends Component {
     render() {
         console.log("props:", this.props);
 
-        this.props.window.onError("hello error");
-
         let icon = null;
 
         if (this.props.user.login && this.props.window.loaded){

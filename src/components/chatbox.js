@@ -17,9 +17,7 @@ class ChatBox extends Component {
     };
 
     onInputKeyDown = (event) => {
-        console.log("onInputKeyDown");
-
-        const {id, submitChannelState} = this.props;
+        const {id, submitChannelState, onError} = this.props;
 
         //const id = event.target.id;
         let cState = this.state.channelState;
@@ -27,7 +25,6 @@ class ChatBox extends Component {
         if (event.key === 'Enter') {
             cState.submitting = true;
     
-            // this.props.sbSetChanStates({channelStates});
             this.setState({
                 channelState: cState
             });
@@ -37,12 +34,12 @@ class ChatBox extends Component {
                 cState.submitting = false;
 
                 if (error) {
-                    // this.props.sbSetChanStates({channelStates});
                     this.setState({
                         channelState: cState
                     });
     
                     console.error(error);
+                    onError(error);
                     return;
                 }
     
@@ -51,20 +48,20 @@ class ChatBox extends Component {
     
                 submitChannelState(id, cState);
             });
-        } else {
-            cState.newMessage = cState.newMessage + event.key;
-    
-            //this.props.sbSetChanStates(channelStates);
-            //#TODO: Store in its own state
-            this.setState({
-                channelState: cState
-            });
         }
-    };
+    }
+
+    onMessageChange = (event) => {
+        let cState = this.state.channelState;
+        cState.newMessage = event.target.value;
+
+        this.setState({
+            channelState: cState
+        });
+    }
 
     render() {
         const { id , isAdmin, name, onCloseClick, onHideChatBox } = this.props;
-        //#TODO: get channel related info from props
         console.log("Chatbox[", id, "] rendering!");
         console.log("props: ", this.props);
 
@@ -87,6 +84,7 @@ class ChatBox extends Component {
                         value={this.state.channelState.newMessage}
                         disabled={this.state.channelState.submitting}
                         onKeyPress={this.onInputKeyDown}
+                        onChange={this.onMessageChange}
                         style={{ display: 'inline-block' }}
                         placeholder='Type-in your message'
                     />

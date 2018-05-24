@@ -27,6 +27,7 @@ class AdminChatApp extends Component {
             this.sb.groupChannelLeave(channel, (response, error) => {
                 if (error) {
                     console.error(error);
+                    this.props.window.onError(error);
                     return;
                 }
 
@@ -102,6 +103,7 @@ class AdminChatApp extends Component {
                             this.props.sbSetChanStates(states);
                         }
                     }
+                    onError={ this.props.window.onError}
                 />
             );
         });
@@ -123,8 +125,8 @@ class AdminChatApp extends Component {
     }
 }
 
-const mapStateToProps = ({ user, sendbird }) => ({
-    user, sendbird
+const mapStateToProps = ({ user, sendbird, window }) => ({
+    user, sendbird, window
 });
 
 const mapDispatchToProps =(dispatch) => {

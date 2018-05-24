@@ -53,11 +53,7 @@ class ChannelBoard extends Component {
                     if (error) {
                         console.log(error);
                         
-                        //#TODO: Handle Error & Retry!
-                        // this.setState({ 
-                        //     hasError: true, 
-                        //     errMsg: JSON.stringify(error) 
-                        // });
+                        this.props.window.onError(error);
                         return;
                     }
                     console.log('joined channel: ', generalChannel.name);
@@ -107,6 +103,7 @@ class ChannelBoard extends Component {
             this.sb.openChannelExit(this.props.sendbird.generalChannel, (response, error) => {
                 if (error) {
                     console.error(error);
+                    this.props.window.onError(error);
                     return;
                 }
 
@@ -120,6 +117,7 @@ class ChannelBoard extends Component {
                     this.sb.groupChannelLeave(channel, (response, error) => {
                         if (error) {
                             console.error(error);
+                            this.props.window.onError(error);
                             return;
                         }
 
@@ -188,6 +186,7 @@ class ChannelBoard extends Component {
             this.sb.groupChannelLeave(channel, (response, error) => {
                 if (error) {
                     console.error(error);
+                    this.props.window.onError(error);
                     return;
                 }
     

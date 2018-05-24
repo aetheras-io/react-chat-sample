@@ -47,6 +47,7 @@ class CustomerChatApp extends Component {
                             this.props.sbSetChanStates(states);
                         }
                     }
+                    onError={ this.props.window.onError}
                 />
             );
         });
@@ -64,8 +65,8 @@ class CustomerChatApp extends Component {
     }
 }
 
-const mapStateToProps = ({ user, sendbird }) => ({
-    user, sendbird
+const mapStateToProps = ({ user, sendbird, window }) => ({
+    user, sendbird, window
 });
 
 const mapDispatchToProps =(dispatch) => {
